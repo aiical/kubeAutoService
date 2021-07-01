@@ -6,6 +6,7 @@ metadata:
   name: {{ serviceName }}-zookeeper
   namespace: {{ namespace }}
 spec:
+  serviceAccountName: {{ serviceName }}-zookeeper
   replicas: 3
   selector:
     matchLabels:
@@ -16,6 +17,18 @@ spec:
       labels:
         app: {{ serviceName }}-zookeeper
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ serviceName }}-zookeeper
+              topologyKey: kubernetes.io/hostname
       containers:
       - command:
         - /bin/bash

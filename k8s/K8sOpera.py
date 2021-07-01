@@ -13,7 +13,7 @@ from k8s.Gateway import Gateway
 from k8s.DestinationRule import DestinationRule
 from k8s.VirtualService import VirtualService
 from k8s.Job import Job
-from k8s.Cronjob import Cronjob
+from k8s.Cronjob import CronJob
 
 
 class K8sOpera:
@@ -100,7 +100,7 @@ class K8sOpera:
         elif announce_type == "timed":
             """生成cronjob.yaml"""
             logger.info("生成k8s资源清单cronjob.yaml")
-            cronjob = Cronjob(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
+            cronjob = CronJob(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
             cronjob_list = cronjob.get_cronjob_info()
             start_command_list.extend(cronjob.create_cronjob_yaml(cronjob_list))
         elif announce_type == "permanent":
