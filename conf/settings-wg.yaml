@@ -1,0 +1,55 @@
+connectInfo:
+  env: wg-prod
+  token: "eyJhbGciOiJSUzI1NiIsImtpZCI6IjR2T010cGJRRG8wZnNrWkpULWlTTWc1R2NlVmZkSWlVX0E4TnFOYnd4aGcifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6InNhLWF1dG8tdG9rZW4tNmg3bWciLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoic2EtYXV0byIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjU2MzM2NWM2LTZiZWItNGNiOC04Y2Y5LTRjZjAwM2FjYmFmZSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OnNhLWF1dG8ifQ.d1IcxVwB7Elre3BmoZAECSifESPgX1sWJa8xUmcFCVax8Gk92-JQ0pEam-IovQhDwCvZpkNn33ATrXPbpqDjXJ5gOpmtnKUsg8Ny8i0dna98LRpROFEtAbUhYEcZuhHg11JhyZkJSy1wji0pxdV-VprgRq0hECQtmUloWrHhJg2b9b3m4Q8CSVHehiIW60q2BlXDMWEbPm-8U-L9uIiFCpDNGloTRRns17o04iDUcmEg41yk1qLZtiSot5Q5qjX6gpl5KhM9YPjbtjAkxcELgt47FzLGHxrPjs7GL0Bo7eQayf7k6sa7sj9PrpySySbc0LXcD_V1PIcarthSL20C-g"
+  host: 10.3.136.198
+  port: 20009
+  nodes:
+  - 10.3.136.200
+  - 10.3.136.201
+  - 10.3.136.202
+  - 10.3.136.203
+  - 10.3.136.204
+  - 10.3.136.205
+  - 10.3.136.206
+  clusterDnsDomain: cluster.local
+apiServer:
+  host: 10.3.136.199
+  port: 8443
+istioInfo:
+  version: 1.6.8
+nginxInfo:
+  host:
+  - 10.3.137.12
+  - 10.3.137.13
+  homeDir: /nginx
+pathInfo:
+  toolPath: /docker/images/toolMedia/
+  deployBasePath: /docker/images
+harborInfo:
+  host: 10.3.137.16
+  user: admin
+  password: Harbor12345
+filebeatDefaults:
+  version: 7.9.2
+  kafkaInfo:
+  - host: 10.3.143.106
+    port: 9093
+  - host: 10.3.143.107
+    port: 9093
+  logstashHost:
+  - host: 10.11.114.111
+    port: 5044
+skyWalkingDefaults:
+  host: 10.11.114.68
+nfsDefaults:
+  version: 4.1
+  host: 172.30.240.10
+  srcPath: /nfsdata
+  mountPath: /nfsdata
+objectStorage:
+  accessKey: "73FCAA60DF324903E0533784030AAACA"
+  serverUrl: "http://172.30.241.24:8800/downloadfile"
+  clientIp: 10.3.132.53
+taskInfoBack:
+  # url: "http://172.30.240.6:20009/state"
+  url: "http://172.30.240.17:8888/datab/config/callback"

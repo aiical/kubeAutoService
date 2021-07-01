@@ -1,0 +1,38 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ serviceName }}-svc-allow-policy
+  namespace: {{ namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ serviceName }}
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        {% for item in allowFromServiceList %}
+        - "cluster.local/ns/{{ item.namespace }}/sa/{{ item.serviceName }}"
+        {% endfor %}
+    - source:
+        namespaces:
+        - {{ namespace }}
+        {% if allowFromNamespaceList is not none %}
+        {% for namespace in allowFromNamespaceList %}
+        - {{ namespace }}
+        {% endfor %}
+        {% endif %}
+    - source:
+        notIpBlocks:
+        {% if nginxIpList is not none %}
+        {% for item in nginxIpList %}
+        - {{ item }}
+        {% endfor %}
+        {% endif %}
+        {% if allowFromIpList is not none %}
+        {% for ip in allowFromIpList %}
+        - {{ ip }}
+        {% endfor %}
+        {% endif %}

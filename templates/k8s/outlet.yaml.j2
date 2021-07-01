@@ -1,0 +1,53 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ serviceName }}-out-gw
+  namespace: {{ namespace }}
+spec:
+  selector:
+    istio: egressgateway
+  servers:
+  - port:
+      number: 80
+      name: {{ serviceName }}
+      protocol: HTTP
+    hosts:
+    - {{ url }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ serviceName }}-through-mesh
+  namespace: {{ namespace }}
+spec:
+  hosts:
+  - {{ url }}
+  gateways:
+  - mesh
+  - {{ serviceName }}-out-gw
+  http:
+  - match:
+    - gateways:
+      - mesh
+      port: 80
+    route:
+    - destination:
+        host: istio-egressgateway.istio-system.svc.cluster.local
+        port:
+          number: 80
+  - match:
+    - gateways:
+      - {{ serviceName }}-out-gw
+      port: 80
+    route:
+    - destination:
+        {% if type == "https" %}
+        host: nginx.proxy.https
+        port:
+          number: 8888
+        {% else %}
+        host: nginx.proxy.http
+        port:
+          number: 1080
+        {% endif %}

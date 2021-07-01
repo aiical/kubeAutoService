@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  {% if ifHeadless == "Y" %}
+  name: {{ serviceName }}-headless
+  {% else %}
+  name: {{ serviceName }}
+  {% endif %}
+  namespace: {{ namespace }}
+  labels:
+    app: {{ serviceName }}
+    service: {{ serviceName }}
+spec:
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  type: {{ serviceType }}
+  {% if ifHeadless == "Y" %}
+  clusterIP: None
+  {% endif %}
+  ports:
+  - name: {{ protocol }}
+    port: {{ containerPort }}
+    targetPort: {{ containerPort }}
+    {# 若服务为nodePort,加上nodePort端口配置 #}
+    {% if serviceType == "NodePort" %}
+    nodePort: {{ nodePort }}
+    {% endif %}
+  selector:
+    app: {{ serviceName }}

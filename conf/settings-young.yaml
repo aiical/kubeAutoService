@@ -1,0 +1,53 @@
+connectInfo:
+  env: young-test
+  token: "eyJhbGciOiJSUzI1NiIsImtpZCI6IjIzVVBJYXY1eHR6TVRZenVsWlQybC1kcVNpMWlSWHNidHNNX01rSkxrRk0ifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6InNhLWF1dG8tdG9rZW4tN3h2aDIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoic2EtYXV0byIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImVhY2E5ZDMxLTVlODUtNDEwZC1hZTUxLWZmZmY0YWEwMWRkNSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OnNhLWF1dG8ifQ.Z5JDPpKNyv420n6CsUdIwWdjQOYJCYE3yaNUgC_BZ9JOyTIfmE6fFUgoM4NEjwJPMczbZJx4aNbbIxTMF3L7m_o5Lo2aQ3VO9KtTAweQMVKOyA3gugG33LFS-eWXZhMdsPYR6VJwMl6FLkEdkqyF0blB7yrt0qzcjv7YbPcziuwOucKki7iDrdzoeIfLUmMWDRITU2bZgZ6qUq-oWsTD7jNhoWB-cWnZCZkRV_PFU08KJTvZgboSYt4YNjgNT8ceIJrDSoYFWltjP8IkrYfvoP4CKyreDVfc9w1Kr2LQKr1elQcf2EazBxbscyPMpM86agJ2_w-ta9KvEegMKLxs7g"
+  host: 172.30.240.6
+  port: 20008
+  nodes:
+  - 172.30.240.10
+  - 172.30.240.11
+  - 172.30.240.12
+  - 172.30.240.13
+  - 172.30.240.14
+  - 172.30.240.15
+  clusterDnsDomain: cluster.local
+apiServer:
+  host: 172.30.240.6
+  port: 6443
+istioInfo:
+  version: 1.6.8
+nginxInfo:
+  host:
+  - 172.30.240.17
+  homeDir: /nginx
+pathInfo:
+  toolPath: /docker/images/toolMedia/
+  deployBasePath: /docker/images
+harborInfo:
+  host: 172.30.240.8
+  user: admin
+  password: Harbor12345
+filebeatDefaults:
+  version: 7.9.2
+  kafkaInfo:
+  - host: 10.3.143.106
+    port: 9093
+  - host: 10.3.143.107
+    port: 9093
+  logstashHost:
+  - host: 10.11.114.111
+    port: 5044
+skyWalkingDefaults:
+  host: 10.11.114.68
+nfsDefaults:
+  version: 4.1
+  host: 172.30.240.10
+  srcPath: /nfsdata
+  mountPath: /nfsdata
+objectStorage:
+  accessKey: "73FCAA60DF324903E0533784030AAACA"
+  serverUrl: "http://172.30.241.24:8800/downloadfile"
+  clientIp: 10.3.132.53
+taskInfoBack:
+  # url: "http://172.30.240.6:20009/state"
+  url: "http://172.30.240.17:8888/datab/config/callback"

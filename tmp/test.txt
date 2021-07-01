@@ -1,0 +1,37 @@
+# 查所有namespace
+http://144.131.254.6:20008/auto/check?checkType=namespace
+
+# 查单个service下的pod
+http://144.131.254.6:20008/auto/check?checkType=pod&range=svc&namespace=young-system&service=young-alarmmonitor
+# 查所有namespace下pod
+http://144.131.254.6:20008/auto/check?checkType=pod&range=all
+# 查单个namespace下pod
+http://144.131.254.6:20008/auto/check?checkType=pod&range=ns&namespace=young-system
+
+# 查所有namespace下service
+http://144.131.254.6:20008/auto/check?checkType=service&range=all
+# 查单个namespace下service
+http://144.131.254.6:20008/auto/check?checkType=service&range=ns&namespace=young-system
+
+# 查单个node状态
+http://144.131.254.6:20008/auto/check?checkType=node&range=node&node=144.131.254.33
+# 查所有node
+http://144.131.254.6:20008/auto/check?checkType=node&range=all
+
+# 查componentstatuses
+http://144.131.254.6:20008/auto/check?checkType=component
+
+# 查单个pod的log
+http://144.131.254.6:20008/auto/check?checkType=log&namespace=young-system&pod=young-automanagement-s1-567985c59d-8bwc7&container=young-automanagement-s1&previous=false&tail=100
+
+
+
+harbor:
+http://144.131.254.6:20008/auto/harbor?type=projects&range=all
+
+http://144.131.254.6:20008/auto/harbor?type=repositories&project=app&range=all
+
+http://144.131.254.6:20008/auto/harbor?type=artifacts&project=app&repository=young-web&range=all
+
+http://144.131.254.6:20008/auto/harbor?type=tags&project=library&repository=centos&artifact_digest=sha256:3ec6e5f7fea8f282cebff77041d284acae12ab3fdcdcb8a29b0dc4bc402b7f40&range=all
+

@@ -1,0 +1,54 @@
+# 全局配置
+global:
+
+  mode: new
+
+  runEnv: prod
+
+  type: run-redis
+
+  # 必填
+  # 所在集群名
+  # 默认dc01，现有(dc01，dc02)
+  dcName: dc01
+
+  sysName: young
+
+  appName: web
+
+  redisTag:
+
+# kubernetes配置
+# 生成k8s和istio的各项资源配置清单yaml文件的配置
+kubernetes:
+
+  nodeSelector:
+  - name: sysname
+    value: default
+
+  tcpPortNum:
+
+  # 选填
+  # cpu配置
+  # 默认
+  # request: 250m
+  # limit: 2
+  cpu:
+    request: 250m
+    limit: 2
+
+  # 选填
+  # 内存配置
+  # 默认
+  # request: 64Mi
+  # limit: 4096Mi
+  memory:
+    request: 4Gi
+    limit: 10Gi
+
+
+  volumeType:
+
+  serverType:
+    type: istio
+

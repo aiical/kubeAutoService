@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ serviceName }}-redis
+    service: {{ serviceName }}-redis
+  name: {{ serviceName }}-redis
+  namespace: {{ namespace }}
+spec:
+  ports:
+  - name: tcp
+    port: 6379
+    targetPort: 6379
+  selector:
+    app: {{ serviceName }}-redis
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ serviceName }}-redis-gw
+  namespace: {{ namespace }}
+spec:
+  selector:
+    istio: ingressgateway-{{ namespace }}
+  servers:
+  - hosts:
+    - {{ serviceName }}-redis.{{ dcName }}.com
+    port:
+      name: {{ serviceName }}-redis
+      number: {{ tcpPort }}
+      protocol: TCP
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ serviceName }}-redis-vs
+  namespace: {{ namespace }}
+spec:
+  gateways:
+  - {{ serviceName }}-redis-gw
+  hosts:
+  - {{ serviceName }}-redis.{{ dcName }}.com
+  tcp:
+  - match:
+    - port: {{ tcpPort }}
+    route:
+    - destination:
+        host: {{ serviceName }}-redis
+        port:
+          number: 6379

@@ -1,0 +1,41 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: {{ serviceName }}-dr
+  namespace: {{ namespace }}
+spec:
+#  host: {{ serviceName }}
+  host: {{ serviceName }}.{{ namespace }}.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      {% if ruleType == "roundRobin" %}
+      {# roundRobin #}
+      simple: ROUND_ROBIN
+      {% elif ruleType == "random" %}
+      simple: RANDOM
+      {% elif ruleType == "leastConn" %}
+      simple: LEAST_CONN
+      {% elif ruleType == "useSourceIp" %}
+      {# useSourceIp #}
+      useSourceIp
+      {% else %}
+      consistentHash:
+        {% if ruleType == "httpCookie" %}
+        {# httpCookie #}
+        httpCookie:
+          name: {{ httpCookieName }}
+          ttl: {{ httpCookieTtl }}
+        {% else %}
+        {# httpHeaderName #}
+        httpHeaderName: {{ httpHeaderName }}
+        {% endif %}
+      {% endif %}
+  {% if versionCount != 1 %}
+  subsets:
+  {% for i in range(1, versionCount + 1) %}
+  - name: v{{ i }}
+    labels:
+      version: v{{ i }}
+  {% endfor %}
+  {% endif %}

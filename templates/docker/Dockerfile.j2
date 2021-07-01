@@ -1,0 +1,44 @@
+{# FROM #}
+FROM {{ baseFrom }}
+{# MAINTAINER #}
+MAINTAINER {{ maintainer }}
+{# WORKDIR #}
+WORKDIR {{ workdir }}
+{# ENV #}
+{% if envList is not none %}
+{% for env in envList %}
+ENV {{ env }}
+{% endfor %}
+{% endif %}
+{# RUN mkdir #}
+{% if mkdirList != [] %}
+{% for mkdir in mkdirList %}
+{{ mkdir }}
+{% endfor %}
+{% endif %}
+{# ADD #}
+{% if addList is not none %}
+{% for add in addList %}
+ADD {{ add }}
+{% endfor %}
+{% endif %}
+{# COPY #}
+{% if copyList is not none %}
+{% for copy in copyList %}
+COPY {{ copy }}
+{% endfor %}
+{% endif %}
+{# RUN #}
+{% if runList != [] %}
+{% for run in runList %}
+{{ run }}
+{% endfor %}
+{% endif %}
+{# EXPOSE #}
+{% if expose %}
+EXPOSE {{ expose }}
+{% endif %}
+{# ENTRYPOINT #}
+{% if entrypoint %}
+ENTRYPOINT {{ entrypoint }}
+{% endif %}

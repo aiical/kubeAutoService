@@ -1,0 +1,62 @@
+# 全局配置
+global:
+
+  # 必填
+  # new: 新增系统大类
+  # add: 已有系统大类，新增配置
+  # 默认new
+  mode: new
+
+  runEnv: prod
+
+  dcName: dc01
+
+  # 系统大类名称
+  # 例：young
+  # 必填
+  sysName: ycmp
+
+nfsProviderInfo:
+  # none: 系统无需创建pvc
+  # default: 系统使用默认nfs创建pvc
+  # customize: 自定义nfs信息
+  type: default
+  version:
+  host:
+  srcPath:
+  mountPath:
+
+# istio-ingress-gateway配置
+gatewayInfo:
+  replicas: 2
+  cpu:
+    request: 250m
+    limit: 2
+  memory:
+    request: 1Gi
+    limit: 3Gi
+
+# 端口配置
+traffic:
+  http:
+    nodePort: 31382
+    nginxPortNoSsl: 8889
+    nginxPortSsl: 8890
+
+  # mode == 'new'时选填
+  # mode == 'add'时必填
+  # tcp的nodePort端口信息,端口范围（30000-32000），不能重复使用
+  # 列表形式，包含（name,port）
+  tcp:
+  - name: "redis"
+    nodePort: 31384,
+    nginxPort: 8097
+
+istioAuthorizationPolicy:
+  allowFrom:
+    namespace:
+    - kafka-system
+    - flink-system
+    - young-system
+    ip:
+    - 10.3.143.61

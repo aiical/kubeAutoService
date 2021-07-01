@@ -1,0 +1,18 @@
+server {
+    #监听端口
+    {% if http.sslFlag == "Y" %}
+    listen    {{ http.serverPort }}    ssl;
+    {% else %}
+    listen    {{ http.serverPort }};
+    {% endif %}
+    server_name {{ sysName }}
+    charset utf-8;
+    access_log  {{ nginxDir }}/nginx/logs/http-$server_name-$logdate-access.log ;
+    error_log  {{ nginxDir }}/nginx/logs/http-$server_name-$logdate-error.log  ;
+    {% if http.sslFlag == "Y" %}
+    ssl_certificate       ../cert/server.crt;
+    ssl_certificate_key   ../cert/server.key;
+    {% endif %}
+
+    include {{ nginxDir }}/nginx/conf/{{ sysName }}/location-*.conf;
+}

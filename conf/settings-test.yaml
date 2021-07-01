@@ -1,0 +1,43 @@
+connectInfo:
+  env: wh-test
+  token: "eyJhbGciOiJSUzI1NiIsImtpZCI6IllBQnJBNVZOQXJOSnp4a3VvWVE1cWlrMjZhVVRITkNMSEdELVZlYmpRSFEifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6InNhLWF1dG8tdG9rZW4tNHA1NDgiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoic2EtYXV0byIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImE1YWVkNjc5LTYzMGUtNDAxMC04YTQ3LTdjZWU0ZmNmOTE3ZCIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OnNhLWF1dG8ifQ.vDlyiih42tAAXoyxlig3N0MZ7H0sOctZGw--z8vt3MGDnqvWUsFoXXY9gclrtc6B4DOO_9Hnixcn8IA-cPv456Et27fJYn_hqKfFynemB-DTwVu4bUvjoxEZ655kH5_BZXatHwgUP7GM7ScHzwyshxz4eYxvwA46Dx9fY_x9ZSSJBDREMrCEj8hKTovgSJL0k_vRILLDBkVdWU6r12UBn-fLeYm-XTSr7yk0LAKs3K5CxcJGRkb-EuwafHW-Z_5f_Z2DCiVFZCbu4VW2E-L1JeyiM50s4wb8QayR7nTSDRitzXDC4uiLzjFMF0pr2xjkKD2H9US5IsEV9RN3ntmSeQ"
+  host: 10.11.114.28
+  port: 20008
+  nodes:
+  - 10.11.114.33
+  - 10.11.114.34
+  - 10.11.114.116
+  - 10.11.114.117
+  - 10.11.114.129
+  clusterDnsDomain: cluster.local
+apiServer:
+  host: 10.11.114.28
+  port: 6443
+istioInfo:
+  version: 1.6.5
+nginxInfo:
+  host:
+  - 10.11.114.31
+  homeDir: /app/nginx
+pathInfo:
+  toolPath: /docker/images/toolMedia/
+  deployBasePath: /docker/images
+harborInfo:
+  host: 10.11.114.35
+  user: admin
+  password: Harbor12345
+filebeatDefaults:
+  version: 7.9.1
+  logstashHost:
+  - 10.11.114.111
+skyWalkingDefaults:
+  host: 10.11.114.68
+nfsDefaults:
+  version: 4.1
+  host: cfs-Hmuh6UP9VK.lb-a1898e20.whlocal.com
+  srcPath: /
+  mountPath: /cfsdata
+objectStorage:
+  accessKey: "73FCAA60DF324903E0533784030AAACA"
+  serverUrl: "http://10.1.1.198:8800/downloadfile"
+  clientIp: 10.11.32.46

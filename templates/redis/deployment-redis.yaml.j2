@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ serviceName }}-redis
+  name: {{ serviceName }}-redis
+  namespace: {{ namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ serviceName }}-redis
+  template:
+    metadata:
+      labels:
+        app: {{ serviceName }}-redis
+    spec:
+      containers:
+      - args:
+        - /mnt/redis.conf
+        command:
+        - redis-server
+        image: {{ libraryRepository }}/redis:{{ redisVersion }}
+        imagePullPolicy: IfNotPresent
+        name: {{ serviceName }}-redis
+        ports:
+        - containerPort: 6379
+        {# resources #}
+        resources:
+          limits:
+            cpu: {{ cpu.limit }}
+            memory: {{ memory.limit }}
+          requests:
+            cpu: {{ cpu.request }}
+            memory: {{ memory.request }}
+        volumeMounts:
+        - mountPath: /data
+          name: {{ serviceName }}-redis-data
+        - mountPath: /mnt/redis.conf
+          name: {{ serviceName }}-redis-config
+          subPath: redis.conf
+      {# nodeSelector #}
+      {% if nodeSelectorList is not none %}
+      nodeSelector:
+        {% for item in nodeSelectorList %}
+        {{ item }}
+        {% endfor %}
+      {% endif %}
+      volumes:
+      - emptyDir: {}
+        name: {{ serviceName }}-redis-data
+      - configMap:
+          name: {{ serviceName }}-redis-config
+        name: {{ serviceName }}-redis-config

@@ -1,0 +1,19 @@
+6:
+  latest: apache-tomcat-6.0.29.tar.gz
+  others:
+7:
+  latest: apache-tomcat-7.0.104.tar.gz
+  others:
+    - apache-tomcat-7.0.100.tar.gz
+    - apache-tomcat-7.0.103.tar.gz
+8:
+  latest: apache-tomcat-8.5.57.tar.gz
+  others:
+    - apache-tomcat-8.5.45.tar.gz
+    - apache-tomcat-8.5.55.tar.gz
+9:
+  latest: apache-tomcat-9.0.37.tar.gz
+  others:
+    - apache-tomcat-9.0.31.tar.gz
+    - apache-tomcat-9.0.33.tar.gz
+    - apache-tomcat-9.0.35.tar.gz

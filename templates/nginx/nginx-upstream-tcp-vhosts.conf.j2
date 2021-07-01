@@ -1,0 +1,14 @@
+    upstream backend-{{ upstreamName }}-{{ name }}{
+        {% for node in nodes %}
+        server {{ node }}:{{ nodePort }};
+        {% endfor %}
+        check interval=2000 rise=2 fall=3 timeout=1000 default_down=true type=tcp;
+    }
+    server {
+        listen {{ nginxPort }};
+        proxy_pass backend-{{ upstreamName }}-{{ name }};
+        access_log  logs/stream-tcp-backend-{{ sysName }}-{{ name }}-$logdate-access.log  streamlog;
+        error_log  logs/stream-tcp-backend-{{ sysName }}-{{ name }}-error.log  notice;
+        open_log_file_cache max=1000 inactive=20s valid=1m min_uses=2;
+        limit_conn  streamperip  1000;
+    }

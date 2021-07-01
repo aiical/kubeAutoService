@@ -1,0 +1,278 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ serviceName }}
+  namespace: {{ namespace }}
+  labels:
+    app: {{ serviceName }}
+spec:
+  replicas: {{ replicas }}
+  selector:
+    matchLabels:
+      app: {{ serviceName }}
+  serviceName: {{ serviceName }}
+  template:
+    metadata:
+      {# annotations 若服务类型为istio，加上外部服务ip白名单 #}
+      {% if serverType == "istio" and istioWhiteIp != "" %}
+      annotations:
+        traffic.sidecar.istio.io/excludeOutboundIPRanges: {{ istioWhiteIp }}
+      {% endif %}
+      labels:
+        app: {{ serviceName }}
+    spec:
+      serviceAccountName: {{ serviceName }}
+      {# nodeSelector #}
+      {% if nodeSelectorList is not none %}
+      nodeSelector:
+        {% for item in nodeSelectorList %}
+        {{ item }}
+        {% endfor %}
+      {% endif %}
+      {# hostAliases #}
+      {% if hostInfo is not none %}
+      hostAliases:
+      {% for item in hostInfo %}
+      - ip: {{ item.ip }}
+        hostnames:
+        - {{ item.hostName }}
+      {% endfor %}
+      {% endif %}
+      {# affinity #}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ serviceName }}
+              topologyKey: kubernetes.io/hostname
+      {# containers #}
+      containers:
+      {# 应用容器 #}
+      - name: {{ serviceName }}
+        image: {{ imageFullName }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ containerPort }}
+{#        {% if dubboPort != "" %}#}
+{#        - containerPort: {{ dubboPort }}#}
+{#        {% endif %}#}
+        {# 用户自定义env #}
+        {% if envList is not none or skyWalkingFlag == "Y" %}
+        env:
+        {% for item in envList %}
+        - name: {{ item.name }}
+          value: {{ item.value }}
+        {% endfor %}
+        {# skywalking配置env #}
+        {% if skyWalkingFlag == "Y" %}
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: AGENT_OPTS
+          value: -javaagent:/home/agent/skywalking-agent.jar=agent.service_name={{ serviceName }},agent.instance_name=$(POD_NAME)
+        {% endif %}
+        {% endif %}
+        {# startupProbe #}
+        startupProbe:
+          {% if startup.checkType == "httpGet" %}
+          httpGet:
+            port: {{ startup.httpGet.port }}
+            path: {{ startup.httpGet.path }}
+          {% elif startup.checkType == "tcpSocket" %}
+          tcpSocket:
+            port: {{ startup.tcpSocket.port }}
+          {% else %}
+          exec:
+            command:
+            {% for item in startup.exec.commandList %}
+            - item
+            {% endfor %}
+          {% endif %}
+          initialDelaySeconds: {{ startup.initialDelaySeconds }}
+          failureThreshold: {{ startup.failureThreshold }}
+          periodSeconds: {{ startup.periodSeconds }}
+        {# readinessProbe #}
+        readinessProbe:
+          {% if readiness.checkType == "httpGet" %}
+          httpGet:
+            port: {{ readiness.httpGet.port }}
+            path: {{ readiness.httpGet.path }}
+          {% elif readiness.checkType == "tcpSocket" %}
+          tcpSocket:
+            port: {{ readiness.tcpSocket.port }}
+          {% else %}
+          exec:
+            command:
+            {% for item in readiness.exec.commandList %}
+            - item
+            {% endfor %}
+          {% endif %}
+          initialDelaySeconds: {{ readiness.initialDelaySeconds }}
+          failureThreshold: {{ readiness.failureThreshold }}
+          periodSeconds: {{ readiness.periodSeconds }}
+        {# livenessProbe #}
+        livenessProbe:
+          {% if liveness.checkType == "httpGet" %}
+          httpGet:
+            port: {{ liveness.httpGet.port }}
+            path: {{ liveness.httpGet.path }}
+          {% elif liveness.checkType == "tcpSocket" %}
+          tcpSocket:
+            port: {{ liveness.tcpSocket.port }}
+          {% else %}
+          exec:
+            command:
+            {% for item in liveness.exec.commandList %}
+            - item
+            {% endfor %}
+          {% endif %}
+          initialDelaySeconds: {{ liveness.initialDelaySeconds }}
+          failureThreshold: {{ liveness.failureThreshold }}
+          periodSeconds: {{ liveness.periodSeconds }}
+        {# lifecycle #}
+        {% if lifecycle.postStartCommandList is not none or lifecycle.preStopCommandList is not none %}
+        lifecycle:
+          {% if lifecycle.postStartCommandList is not none %}
+          postStart:
+            exec:
+              command:
+              {% for item in lifecycle.postStartCommandList %}
+              - item
+              {% endfor %}
+          {% endif %}
+          {% if lifecycle.preStopCommandList is not none %}
+          preStop:
+            exec:
+              command:
+              {% for item in lifecycle.preStopCommandList %}
+              - item
+              {% endfor %}
+          {% endif %}
+        {% endif %}
+        {# resources #}
+        resources:
+          limits:
+            cpu: {{ cpu.limit }}
+            memory: {{ memory.limit }}
+            ephemeral-storage: {{ ephemeralStorage.limit }}
+          requests:
+            cpu: {{ cpu.request }}
+            memory: {{ memory.request }}
+            ephemeral-storage: {{ ephemeralStorage.request }}
+        {# volumeMounts #}
+        {% if fileBeatFlag == "Y" or volumeInfo.mountCount > 0 %}
+        volumeMounts:
+        {# filebeat配置volumeMounts #}
+        {% if fileBeatFlag == "Y" %}
+        - name: app-logs
+          mountPath: /logs
+        {% endif %}
+        {# emptyDir配置volumeMounts #}
+        {% if volumeInfo.emptyDir is not none %}
+        {% for item in volumeInfo.emptyDir %}
+        - name: {{ item.name }}
+          mountPath: {{ item.mountPath }}
+        {% endfor %}
+        {% endif %}
+        {# hostPath配置volumeMounts #}
+        {% if volumeInfo.hostPath is not none %}
+        {% for item in volumeInfo.hostPath %}
+        - name: {{ item.name }}
+          mountPath: {{ item.mountPath }}
+        {% endfor %}
+        {% endif %}
+        {# pvc配置volumeMounts #}
+        {% if volumeInfo.pvc is not none %}
+        {% for item in volumeInfo.pvc %}
+        - name: {{ item.name }}
+          mountPath: {{ item.mountPath }}
+        {% endfor %}
+        {% endif %}
+        {# configMap配置volumeMounts #}
+        {% if volumeInfo.configMap is not none %}
+        {% for item in volumeInfo.configMap %}
+        - name: {{ item.name }}
+          mountPath: {{ item.mountPath }}/{{ item.file }}
+          subPath: {{ item.file }}
+        {% endfor %}
+        {% endif %}
+        {% endif %}
+      {# fileBeat容器 #}
+      {% if fileBeatFlag == "Y" %}
+      - name: filebeat
+        image: {{ libraryRepository }}/filebeat:{{ filebeatVersion }}
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: app-logs
+          mountPath: /logs
+        - name: filebeat-path
+          mountPath: /home/filebeat-{{ filebeatVersion }}-linux-x86_64/configs/path.yml
+          subPath: path.yml
+        - name: filebeat-conf
+          mountPath: /home/filebeat-{{ filebeatVersion }}-linux-x86_64/filebeat.yml
+          subPath: filebeat.yml
+      {% endif %}
+      {# volumes #}
+      {% if fileBeatFlag == "Y" or volumeInfo.volumeCount > 0 %}
+      volumes:
+      {# filebeat配置volumes #}
+      {% if fileBeatFlag == "Y" %}
+      - name: app-logs
+        emptyDir: {}
+      - name: filebeat-path
+        configMap:
+          name: {{ serviceName }}-fb-path
+      - name: filebeat-conf
+        configMap:
+          name: {{ serviceName }}-fb-conf
+      {% endif %}
+      {# emptyDir配置volumes #}
+      {% if volumeInfo.emptyDir is not none %}
+      {% for item in volumeInfo.emptyDir %}
+      - name: {{ item.name }}
+        emptyDir: {}
+      {% endfor %}
+      {% endif %}
+      {# hostPath配置volumes #}
+      {% if volumeInfo.hostPath is not none %}
+      {% for item in volumeInfo.hostPath %}
+      - name: {{ item.name }}
+        hostPath:
+          path: {{ item.localPath }}
+      {% endfor %}
+      {% endif %}
+      {# configMap配置volumes #}
+      {% if volumeInfo.configMap is not none %}
+      {% for item in volumeInfo.configMap %}
+      - name: {{ item.name }}
+        configMap:
+          name: {{ item.name }}
+      {% endfor %}
+      {% endif %}
+      {% endif %}
+  {# pvc配置volumeClaimTemplates #}
+  {% if volumeInfo.pvc is not none %}
+  volumeClaimTemplates:
+  {% for item in volumeInfo.pvc %}
+  - metadata:
+      name: {{ item.name }}
+    spec:
+      accessModes:
+      {% for mode in item.accessModes %}
+      - {{ mode }}
+      {% endfor %}
+      resources:
+        requests:
+          storage: {{ item.size }}
+      storageClassName: {{ item.storageClassName }}
+  {% endfor %}
+  {% endif %}
+

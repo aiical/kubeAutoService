@@ -1,0 +1,36 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ serviceName }}-vs
+  namespace: {{ namespace }}
+spec:
+  gateways:
+  - {{ serviceName }}-gw
+  hosts:
+  {% if isPassThrough == "Y" %}
+  - '*'
+  {% else %}
+#   - {{ serviceName }}.{{ dcName }}.com
+  - {{ serviceName }}.{{ namespace }}.svc.cluster.local
+  {% endif %}
+  {% if protocol == "http" %}
+  http:
+  - route:
+  {% elif protocol == "tcp" %}
+  tcp:
+  - match:
+    - port: {{ tcpPortNum }}
+    route:
+  {% endif %}
+    {% for i in range(1, versionCount + 1) %}
+    - destination:
+#        host: {{ serviceName }}
+        host: {{ serviceName }}.{{ namespace }}.svc.cluster.local
+        port:
+          number: {{ containerPort }}
+      {% if versionCount != 1 %}
+        version: v{{ i }}
+      weight: {{ weightList[i - 1] }}
+      {% endif %}
+    {% endfor %}

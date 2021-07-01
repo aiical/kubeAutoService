@@ -1,0 +1,26 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ serviceName }}-gw
+  namespace: {{ namespace }}
+spec:
+  selector:
+    istio: ingressgateway-{{ namespace }}
+  servers:
+  - hosts:
+    {% if isPassThrough == "Y" %}
+    - '*'
+    {% else %}
+#    - {{ serviceName }}.{{ dcName }}.com
+    - {{ serviceName }}.{{ namespace }}.svc.cluster.local
+    {% endif %}
+    port:
+      name: {{ serviceName }}
+      {% if protocol == "http" %}
+      number: 80
+      protocol: HTTP
+      {% elif protocol == "tcp" %}
+      number: {{ tcpPortNum }}
+      protocol: TCP
+      {% endif %}

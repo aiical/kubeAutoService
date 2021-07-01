@@ -1,0 +1,144 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ serviceName }}-job
+  namespace: {{ namespace }}
+  labels:
+    app: {{ serviceName }}-job
+spec:
+  parallelism: {{ replicas }}
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: {{ serviceName }}-job
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: {{ serviceName }}-job
+        image: {{ imageFullName }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ containerPort }}
+        {# resources #}
+        resources:
+          limits:
+            cpu: {{ cpu.limit }}
+            memory: {{ memory.limit }}
+            ephemeral-storage: {{ ephemeralStorage.limit }}
+          requests:
+            cpu: {{ cpu.request }}
+            memory: {{ memory.request }}
+            ephemeral-storage: {{ ephemeralStorage.request }}
+        env:
+        {# 用户自定义env #}
+        {% if envList is not none %}
+        {% for item in envList %}
+        - name: {{ item.name }}
+          value: {{ item.value }}
+        {% endfor %}
+        {% endif %}
+        {# skywalking配置env #}
+        {% if skyWalkingFlag == "Y" %}
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: AGENT_OPTS
+          value: -javaagent:/home/agent/skywalking-agent.jar=agent.service_name={{ serviceName }}-job,agent.instance_name=$(POD_NAME)
+        {% endif %}
+        {# volumeMounts #}
+        {% if fileBeatFlag == "Y" or volumeInfo.volumeCount > 0 %}
+        volumeMounts:
+        {# filebeat配置volumeMounts #}
+        {% if fileBeatFlag == "Y" %}
+        - name: app-logs
+          mountPath: /logs
+        {% endif %}
+        {# emptyDir配置volumeMounts #}
+        {% if volumeInfo.emptyDir is not none %}
+        {% for item in volumeInfo.emptyDir %}
+        - name: {{ item.name }}
+          mountPath: {{ item.mountPath }}
+        {% endfor %}
+        {% endif %}
+        {# hostPath配置volumeMounts #}
+        {% if volumeInfo.hostPath is not none %}
+        {% for item in volumeInfo.hostPath %}
+        - name: {{ item.name }}
+          mountPath: {{ item.mountPath }}
+        {% endfor %}
+        {% endif %}
+        {# nfs配置volumeMounts #}
+        {% if volumeInfo.nfs is not none %}
+        {% for item in volumeInfo.nfs %}
+        - name: {{ item.name }}
+          mountPath: {{ item.mountPath }}
+        {% endfor %}
+        {% endif %}
+        {# configMap配置volumeMounts #}
+        {% if volumeInfo.configMap is not none %}
+        {% for item in volumeInfo.configMap %}
+        - name: {{ item.name }}
+          mountPath: {{ item.mountPath }}/{{ item.file }}
+          subPath: {{ item.file }}
+        {% endfor %}
+        {% endif %}
+        {% endif %}
+      {# fileBeat容器 #}
+      {% if fileBeatFlag == "Y" %}
+      - name: filebeat
+        image: {{ libraryRepository }}/filebeat:{{ filebeatVersion }}
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: app-logs
+          mountPath: /logs
+        - name: filebeat-path
+          mountPath: /home/filebeat-{{ filebeatVersion }}-linux-x86_64/configs/path.yml
+          subPath: path.yml
+      {% endif %}
+      {# volumes #}
+      {% if fileBeatFlag == "Y" or volumeInfo.volumeCount > 0 %}
+      volumes:
+      {# filebeat配置volumes #}
+      {% if fileBeatFlag == "Y" %}
+      - name: app-logs
+        emptyDir: {}
+      - name: filebeat-path
+        configMap:
+          name: {{ serviceName }}-fb-path
+      {% endif %}
+      {# emptyDir配置volumes #}
+      {% if volumeInfo.emptyDir is not none %}
+      {% for item in volumeInfo.emptyDir %}
+      - name: {{ item.name }}
+        emptyDir: {}
+      {% endfor %}
+      {% endif %}
+      {# hostPath配置volumes #}
+      {% if volumeInfo.hostPath is not none %}
+      {% for item in volumeInfo.hostPath %}
+      - name: {{ item.name }}
+        hostPath:
+          path: {{ item.localPath }}
+      {% endfor %}
+      {% endif %}
+      {# nfs配置volumes #}
+      {% if volumeInfo.nfs is not none %}
+      {% for item in volumeInfo.nfs %}
+      - name: {{ item.name }}
+        nfs:
+          server: {{ item.server }}
+          path: {{ item.path }}
+      {% endfor %}
+      {% endif %}
+      {# configMap配置volumes #}
+      {% if volumeInfo.configMap is not none %}
+      {% for item in volumeInfo.configMap %}
+      - name: {{ item.name }}
+        configMap:
+          name: {{ item.name }}
+      {% endfor %}
+      {% endif %}
+      {% endif %}

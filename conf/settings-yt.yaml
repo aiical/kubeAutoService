@@ -1,0 +1,54 @@
+connectInfo:
+  env: yt-prod
+  token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ii1YdXFvYzAyT1FQNWtLMHZEZGJtdnhpelY4WS1BMlNTenN5Z0owSGd2d3MifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6InNhLWF1dG8tdG9rZW4tNHBiZ2siLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoic2EtYXV0byIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjAxY2FkODNmLWVkYmMtNDFjYi04MDAyLTdhNGJlN2Y1MDRlYSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OnNhLWF1dG8ifQ.IdaDQ05ZQDZ8jtxSmRb04EneQXOf0BVjwoLEJiBLnwWm2ugWCTeY7BjZhAKxW2RqSdi-GxPR6boPBzofZgXXyu1ubjG6_gnnwW4eSUWViT0WlmNJdDmZ-a3Fi2JBr35Ay3lMC_0MDWZcsNOR5JAWpazlhD3kISYpcixMhWyK6j2M86zuRq1LATzIo_tRa-xTOT2P94HCGJES8qFo2iVkqP3pev09paRTe3tPJRMAvhzC_-ywbGkQKuMZ0WvfNBXl1UgRc5n7eLjHGHRGZvNDRPwPSOWX797dox3Lkk_OMjn9z84FrtKiyl1y9FLUhuXkv5C2Xj-78vra0wFi1WVfVQ"
+  host: 10.3.143.61
+  port: 20009
+  nodes:
+  - 10.3.143.54
+  - 10.3.143.55
+  - 10.3.143.56
+  - 10.3.143.57
+  - 10.3.143.58
+  - 10.3.143.59
+  clusterDnsDomain: cluster.local
+apiServer:
+  host: 10.3.143.53
+  port: 8443
+istioInfo:
+  version: 1.6.8
+nginxInfo:
+  host:
+  - 10.3.143.61
+  homeDir: /nginx
+pathInfo:
+  toolPath: /docker/images/toolMedia/
+  deployBasePath: /docker/images
+harborInfo:
+  host: 10.3.143.63
+  user: admin
+  password: Harbor12345
+filebeatDefaults:
+  version: 7.9.2
+  kafkaInfo:
+  - host: 10.3.143.106
+    port: 9093
+  - host: 10.3.143.107
+    port: 9093
+  - host: 10.3.143.108
+    port: 9093
+  logstashHost:
+  - host: 10.3.134.50
+    port: 5044
+skyWalkingDefaults:
+  host: 10.3.134.49
+nfsDefaults:
+  version: 4.1
+  host: 10.3.120.20
+  srcPath: /nfs_kbs_young_data
+  mountPath: /nfs_kbs_young_data
+objectStorage:
+  accessKey: "73FCAA60DF324903E0533784030AAACA"
+  serverUrl: "http://10.1.1.198:8800/downloadfile"
+  clientIp: 10.3.132.53
+taskInfoBack:
+  url: "http://10.3.137.14:8888/datab/config/callback"

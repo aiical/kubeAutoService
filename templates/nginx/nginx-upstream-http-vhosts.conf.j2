@@ -1,0 +1,7 @@
+    upstream  {{ upstreamName|upper }}  {
+              sticky name={{ upstreamName|upper }}  path=/ expires=30 hash=md5 no_fallback;
+              {% for node in nodes %}
+              server   {{ node }}:{{ http.httpNodePort }};
+              {% endfor %}
+              check interval=2000 rise=2 fall=3 timeout=1000 default_down=true type=tcp;
+    }

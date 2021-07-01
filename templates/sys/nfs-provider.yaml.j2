@@ -1,0 +1,120 @@
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: nfs-client-provisioner-{{ sysName }}
+  namespace: {{ namespace }}
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: nfs-client-provisioner-runner-{{ sysName }}
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "update"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "update", "patch"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: run-nfs-client-provisioner-{{ sysName }}
+subjects:
+  - kind: ServiceAccount
+    name: nfs-client-provisioner-{{ sysName }}
+    namespace: {{ namespace }}
+roleRef:
+  kind: ClusterRole
+  name: nfs-client-provisioner-runner-{{ sysName }}
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: leader-locking-nfs-client-provisioner-{{ sysName }}
+  namespace: {{ namespace }}
+rules:
+  - apiGroups: [""]
+    resources: ["endpoints"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: leader-locking-nfs-client-provisioner-{{ sysName }}
+  namespace: {{ namespace }}
+subjects:
+  - kind: ServiceAccount
+    name: nfs-client-provisioner-{{ sysName }}
+    # replace with namespace where provisioner is deployed
+    namespace: {{ namespace }}
+roleRef:
+  kind: Role
+  name: leader-locking-nfs-client-provisioner-{{ sysName }}
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-storage-{{ sysName }}
+  namespace: {{ namespace }}
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"  #---设置为默认的storageclass
+provisioner: nfs-client-{{ sysName }}  #---动态卷分配者名称，必须和上面创建的"PROVISIONER_NAME"变量中设置的Name一致
+parameters:
+  archiveOnDelete: "true"  #---设置为"false"时删除PVC不会保留数据,"true"则保留数据
+mountOptions:
+  - hard        #指定为硬挂载方式
+  - nfsvers={{ nfsInfo.version }}  #指定NFS版本，这个需要根据 NFS Server 版本号设置
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: nfs-client-provisioner-{{ sysName }}
+  namespace: {{ namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-client-provisioner-{{ sysName }}
+  strategy:
+    type: Recreate  #---设置升级策略为删除再创建(默认为滚动更新)
+  template:
+    metadata:
+      labels:
+        app: nfs-client-provisioner-{{ sysName }}
+    spec:
+{#      {% if runEnv != "prod" %}#}
+{#      nodeSelector:#}
+{#        {{ runEnv }}: test#}
+{#      {% endif %}#}
+      serviceAccountName: nfs-client-provisioner-{{ sysName }}
+      containers:
+        - name: nfs-client-provisioner-{{ sysName }}
+          #---由于quay.io仓库国内被墙，所以替换成七牛云的仓库
+          image: {{ libraryRepository }}/nfs-client-provisioner
+          volumeMounts:
+            - name: nfs-client-root-{{ sysName }}
+              mountPath: /persistentvolumes
+          env:
+            - name: PROVISIONER_NAME
+              value: nfs-client-{{ sysName }}  #---nfs-provisioner的名称，以后设置的storageclass要和这个保持一致
+            - name: NFS_SERVER
+              value: {{ nfsInfo.host }}  #---NFS服务器地址，和 valumes 保持一致
+            - name: NFS_PATH
+              value: {{ nfsInfo.srcPath }}/{{ sysName }}/persistentvolumes  #---NFS服务器目录，和 valumes 保持一致
+      volumes:
+        - name: nfs-client-root-{{ sysName }}
+          nfs:
+            server: {{ nfsInfo.host }}  #---NFS服务器地址
+            path: {{ nfsInfo.srcPath }}/{{ sysName }}/persistentvolumes #---NFS服务器目录

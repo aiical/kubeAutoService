@@ -1,0 +1,55 @@
+connectInfo:
+  env: sh-prod
+  token: "eyJhbGciOiJSUzI1NiIsImtpZCI6IjR2T010cGJRRG8wZnNrWkpULWlTTWc1R2NlVmZkSWlVX0E4TnFOYnd4aGcifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6InNhLWF1dG8tdG9rZW4tejc0dm4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoic2EtYXV0byIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6Ijg3NmFkMzIyLWIyOWQtNGE3ZS1hNWNjLTllYTU5YzAzYjQwMyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OnNhLWF1dG8ifQ.ki8M0npYcie4YVl1q00AxeB5_ZuWnsjrEOnLdrsnaWZm-mItIVuWNXvL1z4yGs79NWm5sE6WUjmRuPZqeh7_Olu25K7qBAMEOe6lqQhYQtlRyGIfKI69WhTM2Pjjp5lWeFx6KiRVlvX4tYqX-3Vkf1DUf8sUy40cmp8PR2eh2JxEK5R3semc3VhtQ7F_FqtwFBty80Tiy_0OJgoZ1_hgo4xGZ_JWCPjoTBPcGZOiBqDtiLh0sJ1eqFbUWTgJ4NfuaSkHITAziQnzZGqTcXEggDx6wYf7781R7VhFcIyw-6jDDZTkTW5qtVfy3ZOdVCorEuIhdjVOttMmfrnc3Gi0qA"
+  host: 10.3.137.21
+  port: 20009
+  nodes:
+  - 10.3.137.7
+  - 10.3.137.8
+  - 10.3.137.9
+  - 10.3.137.10
+  - 10.3.137.17
+  - 10.3.137.18
+  clusterDnsDomain: cluster.local
+apiServer:
+  host: 10.3.137.11
+  port: 8443
+istioInfo:
+  version: 1.6.8
+nginxInfo:
+  host:
+  - 10.3.137.12
+  - 10.3.137.13
+  homeDir: /nginx
+pathInfo:
+  toolPath: /docker/images/toolMedia/
+  deployBasePath: /docker/images
+harborInfo:
+  host: 10.3.137.16
+  user: admin
+  password: Harbor12345
+filebeatDefaults:
+  version: 7.9.2
+  kafkaInfo:
+  - host: 10.3.143.106
+    port: 9093
+  - host: 10.3.143.107
+    port: 9093
+  - host: 10.3.143.108
+    port: 9093
+  logstashHost:
+  - host: 10.3.134.50
+    port: 5044
+skyWalkingDefaults:
+  host: 10.3.134.49
+nfsDefaults:
+  version: 4.1
+  host: 10.3.120.20
+  srcPath: /nfs_mir_vol1
+  mountPath: /log
+objectStorage:
+  accessKey: "73FCAA60DF324903E0533784030AAACA"
+  serverUrl: "http://10.1.1.198:8800/downloadfile"
+  clientIp: 10.3.132.53
+taskInfoBack:
+  url: "http://10.3.137.14:8888/datab/config/callback"
