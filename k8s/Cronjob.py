@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from publicClass.Logger import Logger
-from publicClass.PublicFunc import j2_to_file, set_ns_svc, read_yaml
+from publicClass.PublicFunc import j2_to_file, set_ns_svc
 
 
 class Cronjob:

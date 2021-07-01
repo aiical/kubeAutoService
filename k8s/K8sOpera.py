@@ -1,10 +1,9 @@
 #!/usr/local/python374/bin/python3.7
 # -*- coding: utf-8 -*-
-import sys
 import time
 import os
 from publicClass.Logger import Logger
-from publicClass.PublicFunc import shell_cmd, set_ns_svc, j2_to_file, get_files
+from publicClass.PublicFunc import shell_cmd, set_ns_svc, get_files
 from k8s.Service import Service
 from k8s.ServiceAccount import ServiceAccount
 from k8s.Deployment import Deployment
