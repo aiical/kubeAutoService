@@ -75,7 +75,7 @@ class DockerImage:
     """
 
     @staticmethod
-    def create_full_image_name(image_info, date):
+    def create_full_image_name(image_info):
         logger = Logger("server")
         # user_flag = image_info['userTag']
         # exist_image_info = image_info['useExistImageInfo']
@@ -89,6 +89,7 @@ class DockerImage:
         if docker_type == 'new':
             logger.info("本次发布需要制作镜像")
             project_name = sys_name
+            date = time.strftime('%Y%m%d', time.localtime(time.time()))
             DockerImage.create_harbor_project(project_name, harbor_ip, harbor_user, harbor_password)
 
             harbor_url = "https://%s/api/v2.0/projects/%s/repositories/%s/artifacts" \

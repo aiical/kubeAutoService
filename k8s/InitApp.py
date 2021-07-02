@@ -47,7 +47,6 @@ class InitApp:
         try:
             global_config = self.para_config['global']
             mode = global_config['mode']
-            global_config = self.para_config['global']
             docker_config = self.para_config['docker']
             docker_type = docker_config["useType"]
             k8s_config = self.para_config['kubernetes']
@@ -68,7 +67,7 @@ class InitApp:
 
         self.logger.info("本次发布模式：【%s】" % mode_info)
         self.logger.info("本次发布类别：run app")
-        date = time.strftime('%Y%m%d', time.localtime(time.time()))
+        # date = time.strftime('%Y%m%d', time.localtime(time.time()))
         service_name, namespace = set_ns_svc(sys_name, app_name)
         image_info = {
             'dockerInfo': docker_config,
@@ -92,7 +91,7 @@ class InitApp:
         self.logger.info("创建应用镜像全名")
         current_task_step += 1
 
-        str_image_final = DockerImage.create_full_image_name(image_info, date)
+        str_image_final = DockerImage.create_full_image_name(image_info)
         # tag_final = "v20201214.0"
         if isinstance(str_image_final, int) and str_image_final == 1:
             send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
