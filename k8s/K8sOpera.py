@@ -55,20 +55,7 @@ class K8sOpera:
             shell_cmd("server", str_cmd)
         os.makedirs(self.k8s_path)
 
-        # if os.path.exists(self.nginx_path):
-        #     str_cmd = "mv %s %s" % (self.nginx_path, nginx_bak_path)
-        #     logger.info("备份目录%s到%s" % (self.nginx_path, nginx_bak_path))
-        #     logger.info("COMMAND: %s" % str_cmd)
-        #     shell_cmd("server", str_cmd)
-        # os.makedirs(self.nginx_path)
-
         """介质源路径"""
-        # if self.run_env in ["prod", "young"]:
-        #     self.media_src_path = "%s/%s/%s/ConfigMapMedia" % (k8s_base_path, self.sys_name, self.service_name)
-        # else:
-        #     self.media_src_path = "%s/%s/%s/%s/ConfigMapMedia" % (
-        #         k8s_base_path, self.sys_name, self.env_sys_name, self.service_name)
-
         self.media_src_path = "%s/%s/%s/ConfigMapMedia" % (k8s_base_path, self.sys_name, self.service_name)
         self.media_src_path = self.media_src_path.replace("//", "/")
         if not os.path.exists(self.media_src_path):
