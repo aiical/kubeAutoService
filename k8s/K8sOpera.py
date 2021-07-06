@@ -138,20 +138,6 @@ class K8sOpera:
                 virtual_service_info = virtual_service.get_virtual_service_info()
                 start_command_list.extend(virtual_service.create_virtual_service_yaml(virtual_service_info))
 
-                # """生成nginx的location配置文件"""
-                # nginx_location_conf = {
-                #     "sysName": self.sys_name,
-                #     "serviceName": self.service_name,
-                #     "namespace": self.namespace,
-                #     "dcName": self.dc_name,
-                #     "location": self.app_context
-                # }
-                #
-                # nginx_location_file_j2 = "%s/templates/nginx/nginx-http-location.conf.j2" % sys.path[0]
-                # nginx_location_file = "%s/location-%s.conf" % (self.nginx_path, self.service_name)
-                # logger.info("生成应用nginx的相对路径配置location：[%s]" % nginx_location_file)
-                # j2_to_file("server", nginx_location_conf, nginx_location_file_j2, nginx_location_file)
-
             logger.info("启动服务命令列表如下")
             logger.info(start_command_list)
 
@@ -176,29 +162,7 @@ class K8sOpera:
                     del_line = "kubectl delete -f %s" % del_file
                     del_line = del_line.replace(self.k8s_path, self.k8s_bak_path)
                     f.write("%s\n" % del_line)
-
-        # logger.info("执行appStart.sh部署应用")
-        # code = shell_cmd('sh %s/appStart.sh' % self.k8s_path)
-        #
-        # if k8s_del_yaml_file:
-        #     logger.info("卸载较上次发布多余资源")
-        #     for del_file in k8s_del_yaml_file:
-        #         cmd_line = "kubectl delete -f %s" % del_file
-        #         cmd_line = cmd_line.replace(self.k8s_path, self.k8s_bak_path)
-        #         code = code or shell_cmd(cmd_line)
         return 0
-
-    # def delete_no_need_yaml(self, k8s_del_yaml_file):
-    #     logger = Logger("server")
-    #     logger.info("生成deleteNoNeedYaml.sh")
-    #     if k8s_del_yaml_file:
-    #         logger.info("生成deleteNoNeedYaml.sh记录较上次发布多余资源")
-    #         with open(self.k8s_path + '/deleteNoNeedYaml.sh', "w", encoding="utf-8") as f:
-    #             f.write("#!/bin/bash\n")
-    #             for del_file in k8s_del_yaml_file:
-    #                 del_line = "kubectl delete -f %s" % del_file
-    #                 del_line = del_line.replace(self.k8s_path, self.k8s_bak_path)
-    #                 f.write("%s\n" % del_line)
 
     def start_app(self, k8s_del_yaml_file):
         logger = Logger("server")

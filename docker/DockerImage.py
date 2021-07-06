@@ -23,21 +23,13 @@ class DockerImage:
         self.jdk_conf = sys.path[0] + '/conf/jdk_version.yaml'
 
         """生产Dockerfile、介质存放地址"""
-        # self.run_env = self.global_info['runEnv']
         self.sys_name = self.global_info['sysName']
         self.app_name = self.global_info['appName']
 
         """获取服务名和名称空间"""
         self.service_name, namespace = set_ns_svc(self.sys_name, self.app_name)
-        # self.env_sys_name, self.service_name, namespace = set_run_env(self.run_env, self.sys_name, self.app_name)
 
         deploy_base_path = conf['pathInfo']['deployBasePath']
-
-        # if self.run_env in ["prod", "young", "yt"]:
-        #     self.docker_path = "%s/%s/%s/DockerImage" % (deploy_base_path, self.sys_name, self.service_name)
-        # else:
-        #     self.docker_path = "%s/%s/%s/%s/DockerImage" % (
-        #         deploy_base_path, self.sys_name, self.env_sys_name, self.service_name)
 
         self.docker_path = "%s/%s/%s/DockerImage" % (deploy_base_path, self.sys_name, self.service_name)
         self.docker_path = self.docker_path.replace("//", "/")
@@ -68,7 +60,6 @@ class DockerImage:
 
         self.object_storage_conf = conf['objectStorage']
 
-
     """docker镜像属性
     docker镜像所需属性，用于build，tag，push动作
     属性：image，tag
@@ -77,8 +68,6 @@ class DockerImage:
     @staticmethod
     def create_full_image_name(image_info):
         logger = Logger("server")
-        # user_flag = image_info['userTag']
-        # exist_image_info = image_info['useExistImageInfo']
         docker_info = image_info['dockerInfo']
         docker_type = docker_info['useType']
         sys_name = image_info['sysName']
@@ -97,7 +86,6 @@ class DockerImage:
                          "&with_scan_overview=false&with_signature=false&with_immutable_status=false" \
                          % (harbor_ip, project_name, service_name)
             logger.info("镜像查询harbor_url：[%s]" % harbor_url)
-            # artifacts_list = curl_harbor_get_func(harbor_url, harbor_user, harbor_password)
             resp_status, artifacts_list = asyncio.run(harbor_api_http_get(harbor_url, harbor_user, harbor_password))
 
             if isinstance(artifacts_list, int) and artifacts_list == 1:
@@ -152,13 +140,11 @@ class DockerImage:
     def create_harbor_project(project_name, harbor_ip, harbor_user, harbor_password):
         logger = Logger("server")
         harbor_url = "https://%s/api/v2.0/projects?name=%s" % (harbor_ip, project_name)
-        # project_list = curl_harbor_get_func(harbor_url, harbor_user, harbor_password)
         resp_status, project_list = asyncio.run(harbor_api_http_get(harbor_url, harbor_user, harbor_password))
         if len(project_list) == 0:
             logger.info("harbor[%s]中不存在仓库[%s]，准备新建。。。" % (harbor_ip, project_name))
             post_url = "https://%s/api/v2.0/projects" % harbor_ip
             past_data = '{"project_name": "%s", "public": true}' % project_name
-            # post_code = curl_harbor_post_func(post_url, past_data, harbor_user, harbor_password)
             post_code = asyncio.run(harbor_api_http_post(post_url, past_data, harbor_user, harbor_password))
             if post_code == 201:
                 logger.info("harbor[%s]中新建仓库[%s]成功" % (harbor_ip, project_name))
@@ -173,7 +159,6 @@ class DockerImage:
         str_image_final = "%s/%s/%s:%s" % (harbor_ip, project, repository, tag)
         harbor_url = "https://%s/api/v2.0/projects/%s/repositories/%s/artifacts/%s/tags?q=name%%3D%s" % (
             harbor_ip, project, repository, tag, tag)
-        # tag_list = curl_harbor_get_func(harbor_url, harbor_user, harbor_password)
         resp_status, tag_list = asyncio.run(harbor_api_http_get(harbor_url, harbor_user, harbor_password))
         if tag_list.__contains__("errors"):
             logger.error("镜像%s不存在" % str_image_final)
@@ -193,14 +178,12 @@ class DockerImage:
     """
 
     def __get_from(self):
-        # logger = Logger("server")
         tmp_from = self.docker_info['from']
         project_name = tmp_from['projectName']
         image_name = tmp_from['imageName']
         image_tag = tmp_from['imageTag']
         base_from = "%s/%s/%s:%s" % (self.harbor_ip, project_name, image_name, image_tag)
         base_from = base_from.replace("//", "/")
-        # logger.info("test : %s" % base_from)
         return base_from
 
     def __get_maintainer(self):
@@ -227,7 +210,6 @@ class DockerImage:
 
     def __get_run(self):
         list_run = []
-        # str_run = "ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' > /etc/timezone"
         dft_run = "RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' > /etc/timezone"
         list_run.append(dft_run)
         tmp_run = self.docker_info['run']

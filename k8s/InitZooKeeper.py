@@ -27,6 +27,7 @@ class InitZooKeeper:
         self.zk_path = self.zk_path.replace("//", "/")
         if not os.path.exists(self.zk_path):
             os.makedirs(self.zk_path)
+        self.command_list = []
 
     def deploy(self):
         try:
@@ -58,6 +59,7 @@ class InitZooKeeper:
             self.logger.error("zk-statefulSet.yaml生成失败。")
             flag += 1
         self.logger.info("zk-statefulSet.yaml已生成。")
+        self.command_list.append("kubectl apply -f %s" % zk_sts_file)
 
         zk_svc_file_j2 = '%s/templates/zookeeper/service.yaml.j2' % sys.path[0]
         zk_svc_file = '%s/zk-service.yaml' % self.zk_path
@@ -65,6 +67,7 @@ class InitZooKeeper:
             self.logger.error("zk-service.yaml生成失败。")
             flag += 1
         self.logger.info("zk-service.yaml已生成。")
+        self.command_list.append("kubectl apply -f %s" % zk_svc_file)
 
         zk_cm_file_j2 = '%s/templates/zookeeper/configMap.yaml.j2' % sys.path[0]
         zk_cm_file = '%s/zk-configMap.yaml' % self.zk_path
@@ -72,6 +75,7 @@ class InitZooKeeper:
             self.logger.error("zk-configMap.yaml生成失败。")
             flag += 1
         self.logger.info("zk-configMap.yaml已生成。")
+        self.command_list.append("kubectl apply -f %s" % zk_cm_file)
 
         zk_sa_file_j2 = '%s/templates/zookeeper/serviceAccount.yaml.j2' % sys.path[0]
         zk_sa_file = '%s/zk-serviceAccount.yaml' % self.zk_path
@@ -79,6 +83,15 @@ class InitZooKeeper:
             self.logger.error("zk-serviceAccount.yaml生成失败。")
             flag += 1
         self.logger.info("zk-serviceAccount.yaml已生成。")
+        self.command_list.append("kubectl apply -f %s" % zk_sa_file)
+
+        self.logger.info("生成appStart.sh")
+        with open(self.zk_path + '/appStart.sh', "w", encoding="utf-8") as f:
+            f.write("#!/bin/bash\n")
+            """逐行执行部署命令"""
+            for line in self.command_list:
+                f.write("%s\n" % line)
+
         if flag > 0:
             return 1
 
