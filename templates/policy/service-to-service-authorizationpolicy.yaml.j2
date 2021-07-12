@@ -1,0 +1,16 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ toServiceName }}-{{ toNamespace }}-from-{{ fromServiceName }}-{{ fromNamespace }}-policy
+  namespace: {{ toNamespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ toServiceName }}
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - "cluster.local/ns/{{ fromNamespace }}/sa/{{ fromServiceName }}"

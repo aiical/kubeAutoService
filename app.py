@@ -11,6 +11,7 @@ from publicClass.Logger import Logger
 from publicClass.PublicFunc import read_yaml
 from k8s.InitSystem import InitSystem
 from k8s.InitApp import InitApp
+from k8s.InitPolicy import InitPolicy
 from k8s.CheckOpera import CheckOpera
 
 
@@ -91,7 +92,11 @@ def run_auto_set_access_strategy():
 
 
 def set_access_strategy(post_json_data):
-    pass
+    access_strategy = InitPolicy(setting_conf, post_json_data)
+    if access_strategy.mode == "apply":
+        return access_strategy.deploy()
+    else:
+        return access_strategy.delete()
 
 
 def run_redis_task(redis_data):

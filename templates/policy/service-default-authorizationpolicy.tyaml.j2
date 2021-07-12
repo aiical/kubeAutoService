@@ -1,0 +1,24 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ serviceName }}-default-policy
+  namespace: {{ namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ serviceName }}
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        namespaces:
+        - {{ namespace }}
+    - source:
+        notIpBlocks:
+        {% if nginxIpList is not none %}
+        {% for item in nginxIpList %}
+        - {{ item }}
+        {% endfor %}
+        {% endif %}
+
