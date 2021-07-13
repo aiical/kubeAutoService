@@ -12,6 +12,7 @@ from k8s.ConfigMap import ConfigMap
 from k8s.Gateway import Gateway
 from k8s.DestinationRule import DestinationRule
 from k8s.VirtualService import VirtualService
+from k8s.AuthorizationPolicy import AuthorizationPolicy
 from k8s.Job import Job
 from k8s.Cronjob import CronJob
 
@@ -137,6 +138,12 @@ class K8sOpera:
                 virtual_service = VirtualService(self.global_info, self.k8s_info, self.k8s_path)
                 virtual_service_info = virtual_service.get_virtual_service_info()
                 start_command_list.extend(virtual_service.create_virtual_service_yaml(virtual_service_info))
+
+                """生成authorizationPolicy.yaml"""
+                logger.info("生成k8s资源清单authorizationPolicy.yaml")
+                policy = AuthorizationPolicy(self.setting_conf, self.global_info, None, self.k8s_path)
+                policy_info = policy.get_ap_ns_to_svc_info()
+                start_command_list.extend(policy.create_ns_to_svc_yaml(policy_info))
 
             logger.info("启动服务命令列表如下")
             logger.info(start_command_list)
