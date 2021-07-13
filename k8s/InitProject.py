@@ -4,25 +4,25 @@ import json
 import traceback
 from publicClass.Logger import Logger
 from publicClass.JsonCheck import exchange_json
-from publicClass.PublicFunc import set_ns_svc, get_files, shell_cmd, send_state_back
+from publicClass.PublicFunc import send_state_back
 
 
 class InitProject:
-    def __init__(self, settings_conf, pro_info):
+    def __init__(self, settings_conf, info):
         self.logger = Logger("server")
-        self.pro_info = pro_info
+        self.info = info
         self.settings_conf = settings_conf
         try:
             self.task_back_url = self.settings_conf['taskInfoBack']['url']
-            self.task_flow_id = self.pro_info['taskFlowId']
+            self.task_flow_id = self.info['taskFlowId']
         except(KeyError, NameError):
             self.logger.error(traceback.format_exc())
         self.para_config = None
 
     def check(self):
-        self.logger.info("接收服务操作json数据:'%r'" % self.pro_info)
+        self.logger.info("接收服务操作json数据:'%r'" % self.info)
         try:
-            tmp_post_json_data = json.loads(self.pro_info['para'])
+            tmp_post_json_data = json.loads(self.info['para'])
         except(KeyError, NameError):
             self.logger.error(traceback.format_exc())
             return 1

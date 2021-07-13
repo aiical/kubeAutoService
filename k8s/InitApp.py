@@ -5,43 +5,16 @@ import json
 import time
 import traceback
 from docker.DockerImage import DockerImage
+from k8s.InitProject import InitProject
 from k8s.K8sOpera import K8sOpera
 from publicClass.Logger import Logger
 from publicClass.JsonCheck import exchange_json
 from publicClass.PublicFunc import set_ns_svc, get_files, shell_cmd, send_state_back
 
 
-class InitApp:
-    def __init__(self, settings_conf, app_info):
-        self.logger = Logger("server")
-        self.app_info = app_info
-        self.settings_conf = settings_conf
-        try:
-            self.task_back_url = self.settings_conf['taskInfoBack']['url']
-            self.task_flow_id = self.app_info['taskFlowId']
-        except(KeyError, NameError):
-            self.logger.error(traceback.format_exc())
-        self.para_config = None
-
-    def check(self):
-        self.logger.info("接收服务操作json数据:'%r'" % self.app_info)
-        try:
-            tmp_post_json_data = json.loads(self.app_info['para'])
-        except(KeyError, NameError):
-            self.logger.error(traceback.format_exc())
-            return 1
-        self.logger.info("转换前json数据:'%r'" % tmp_post_json_data)
-        self.para_config = exchange_json(tmp_post_json_data)
-        if isinstance(self.para_config, int) and self.para_config == 1:
-            send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
-                            "(init)：发布json预处理失败")
-            self.logger.error("发布json预处理失败")
-            self.logger.error("错误退出程序")
-            return 1
-        send_state_back(self.task_back_url, self.task_flow_id, 2, 3,
-                        "(init)：发布json预处理成功")
-        self.logger.info("转换后json数据:'%r'" % self.para_config)
-        return 0
+class InitApp(InitProject):
+    def __init__(self, settings_conf, info):
+        InitProject.__init__(self, settings_conf, info)
 
     def deploy(self):
         try:
@@ -219,7 +192,7 @@ class InitApp:
     def opera(self):
         try:
             global_config = self.para_config['global']
-            opera_type = self.app_info['operaType']
+            opera_type = self.info['operaType']
             sys_name = global_config['sysName']
             app_name = global_config['appName']
             k8s_base_path = self.settings_conf['pathInfo']['deployBasePath']
