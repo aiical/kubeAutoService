@@ -93,7 +93,7 @@ class AuthorizationPolicy:
         self.logger.info("开始创建AuthorizationPolicy.yaml")
         self.logger.info("AuthorizationPolicy配置如下：")
         self.logger.info(policy_info)
-        policy_yaml_j2 = '%s/templates/policy/namespace-authorizationpolicy.yaml.j2' % sys.path[0]
+        policy_yaml_j2 = '%s/templates/policy/service-default-authorizationpolicy.tyaml.j2' % sys.path[0]
         policy_yaml = '%s/authorizationPolicy.yaml' % self.policy_path
 
         code = j2_to_file("server", policy_info, policy_yaml_j2, policy_yaml)
