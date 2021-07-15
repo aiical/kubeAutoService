@@ -71,7 +71,9 @@ class Service:
         service_yaml_j2 = '%s/templates/k8s/service.yaml.j2' % sys.path[0]
         service_yaml = '%s/%s.yaml' % (self.k8s_path, svc_str)
 
-        j2_to_file("server", service_info, service_yaml_j2, service_yaml)
+        code = j2_to_file("server", service_info, service_yaml_j2, service_yaml)
+        if code == 1:
+            return code
         logger.info("%s.yaml已生成。" % svc_str)
         apply_command_list = ["kubectl apply -f %s" % service_yaml]
         return apply_command_list

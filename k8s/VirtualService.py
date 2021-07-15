@@ -72,7 +72,9 @@ class VirtualService:
         virtual_service_yaml_j2 = '%s/templates/k8s/virtualservice.yaml.j2' % sys.path[0]
         virtual_service_yaml = '%s/virtualservice.yaml' % self.k8s_path
 
-        j2_to_file("server", virtual_service_info, virtual_service_yaml_j2, virtual_service_yaml)
+        code = j2_to_file("server", virtual_service_info, virtual_service_yaml_j2, virtual_service_yaml)
+        if code == 1:
+            return code
         logger.info("virtualservice.yaml已生成。")
         apply_command_list = ["kubectl apply -f %s" % virtual_service_yaml]
         return apply_command_list

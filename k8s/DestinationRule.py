@@ -56,7 +56,9 @@ class DestinationRule:
         destination_rule_yaml_j2 = '%s/templates/k8s/destinationrule.yaml.j2' % sys.path[0]
         destination_rule_yaml = '%s/destinationrule.yaml' % self.k8s_path
 
-        j2_to_file("server", destination_rule_info, destination_rule_yaml_j2, destination_rule_yaml)
+        code = j2_to_file("server", destination_rule_info, destination_rule_yaml_j2, destination_rule_yaml)
+        if code == 1:
+            return code
         logger.info("destinationrule.yaml已生成。")
         apply_command_list = ["kubectl apply -f %s" % destination_rule_yaml]
         return apply_command_list

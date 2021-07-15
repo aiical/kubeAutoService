@@ -35,7 +35,9 @@ class ServiceAccount:
         service_account_yaml_j2 = '%s/templates/k8s/serviceaccount.yaml.j2' % sys.path[0]
         service_account_yaml = '%s/serviceaccount.yaml' % self.k8s_path
 
-        j2_to_file("server", service_account_info, service_account_yaml_j2, service_account_yaml)
+        code = j2_to_file("server", service_account_info, service_account_yaml_j2, service_account_yaml)
+        if code == 1:
+            return code
         logger.info("serviceaccount.yaml已生成。")
         apply_command_list = ["kubectl apply -f %s" % service_account_yaml]
         return apply_command_list

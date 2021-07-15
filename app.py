@@ -93,11 +93,12 @@ def run_auto_set_access_strategy():
 
 
 def set_access_strategy(post_json_data):
-    access_strategy = AuthorizationPolicy(setting_conf, post_json_data)
-    if access_strategy.mode == "apply":
-        return access_strategy.deploy_svc_to_svc(post_json_data)
+    access_strategy = InitPolicy(setting_conf, post_json_data)
+    check_code = access_strategy.check()
+    if check_code == 1:
+        return 1
     else:
-        return access_strategy.delete_svc_to_svc(post_json_data)
+        return access_strategy.deploy()
 
 
 def run_redis_task(redis_data):

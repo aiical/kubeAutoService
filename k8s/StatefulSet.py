@@ -216,7 +216,9 @@ class StatefulSet:
         logger.info(statefulset_info)
         statefulset_yaml_j2 = '%s/templates/k8s/statefulset.yaml.j2' % sys.path[0]
         statefulset_yaml = '%s/statefulset.yaml' % self.k8s_path
-        j2_to_file("server", statefulset_info, statefulset_yaml_j2, statefulset_yaml)
+        code = j2_to_file("server", statefulset_info, statefulset_yaml_j2, statefulset_yaml)
+        if code == 1:
+            return code
         logger.info("statefulset.yaml已生成。")
         if server_type == "istio":
             command = "istioctl kube-inject -f %s | kubectl apply -f -" % statefulset_yaml

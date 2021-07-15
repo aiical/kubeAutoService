@@ -244,7 +244,9 @@ class Deployment:
             logger.info(deployment_info)
             deployment_yaml_j2 = '%s/templates/k8s/deployment.yaml.j2' % sys.path[0]
             deployment_yaml = '%s/deployment-%s.yaml' % (self.k8s_path, version)
-            j2_to_file("server", deployment_info, deployment_yaml_j2, deployment_yaml)
+            code = j2_to_file("server", deployment_info, deployment_yaml_j2, deployment_yaml)
+            if code == 1:
+                return code
             logger.info("deployment-%s.yaml已生成。" % version)
             if server_type == "istio":
                 command = "istioctl kube-inject -f %s | kubectl apply -f -" % deployment_yaml

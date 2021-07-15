@@ -89,7 +89,7 @@ def j2_to_file(log_type, config, file_j2, file_yaml):
         with open(file_yaml, "w", encoding="utf-8") as f:
             f.write(out)
         return 0
-    except Exception as e:
+    except Exception:
         logger.info("j2模板转换失败，报错如下")
         logger.error(traceback.format_exc())
         return 1

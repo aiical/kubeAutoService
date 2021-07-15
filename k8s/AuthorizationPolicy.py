@@ -8,35 +8,11 @@ from publicClass.PublicFunc import set_ns_svc, j2_to_file, shell_cmd
 
 
 class AuthorizationPolicy:
-    def __init__(self, settings_conf, global_info, policy_info, policy_path):
+    def __init__(self, settings_conf, global_info, policy_path):
         self.settings_conf = settings_conf
         self.global_info = global_info
-        self.policy_info = policy_info
         self.policy_path = policy_path
         self.logger = Logger("server")
-    # def __init__(self, settings_conf, policy_info):
-    #     self.logger = Logger("server")
-    #     self.settings_conf = settings_conf
-    #     self.policy_info = policy_info
-    #     try:
-    #         global_config = self.policy_info['global']
-    #         self.from_sys_name = global_config['sysName']
-    #         self.from_app_name = global_config['appName']
-    #         self.to_sys_name = global_config['toSysName']
-    #         self.to_app_name = global_config['toAppName']
-    #         self.sys_base_path = settings_conf['pathInfo']['deployBasePath']
-    #         self.mode = global_config['mode']
-    #     except(KeyError, NameError):
-    #         self.logger.error(traceback.format_exc())
-    #     self.policy_path = "%s/policyFile" % self.sys_base_path
-    #     self.policy_path = self.policy_path.replace("//", "/")
-    #     self.from_service_name, self.from_namespace = set_ns_svc(self.from_sys_name, self.from_app_name)
-    #     self.to_service_name, self.to_namespace = set_ns_svc(self.to_sys_name, self.to_app_name)
-    #     self.policy_name = '%s-%s-from-%s-%s-policy' % (
-    #         self.to_service_name, self.to_namespace, self.from_service_name, self.from_namespace)
-    #     self.policy_file = '%s/%s.yaml' % (self.policy_path, self.policy_name)
-    #     if not os.path.exists(self.policy_path):
-    #         os.makedirs(self.policy_path)
 
     def get_ap_svc_to_svc_info(self):
         self.logger.info("开始获取AuthorizationPolicy信息")
@@ -60,7 +36,7 @@ class AuthorizationPolicy:
         }
         return policy_info
 
-    def deploy_svc_to_svc(self, policy_info):
+    def create_svc_to_svc_yaml(self, policy_info):
         self.logger.info("开始创建AuthorizationPolicy.yaml")
         self.logger.info("AuthorizationPolicy配置如下：")
         self.logger.info(policy_info)
@@ -72,8 +48,12 @@ class AuthorizationPolicy:
         policy_file_j2 = '%s/templates/policy/service-to-service-authorizationpolicy.yaml.j2' % sys.path[0]
         if j2_to_file("server", policy_info, policy_file_j2, policy_file) == 1:
             self.logger.error("%s.yaml生成失败。" % policy_name)
+            return 1
+        return policy_name
 
+    def deploy_svc_to_svc(self, policy_name):
         self.logger.info("%s.yaml已生成。" % policy_name)
+        policy_file = '%s/%s.yaml' % (self.policy_path, policy_name)
         str_command = "kubectl apply -f %s" % policy_file
         code = shell_cmd("server", str_command)
         return code
@@ -116,7 +96,9 @@ class AuthorizationPolicy:
         policy_yaml_j2 = '%s/templates/policy/namespace-authorizationpolicy.yaml.j2' % sys.path[0]
         policy_yaml = '%s/authorizationPolicy.yaml' % self.policy_path
 
-        j2_to_file("server", policy_info, policy_yaml_j2, policy_yaml)
+        code = j2_to_file("server", policy_info, policy_yaml_j2, policy_yaml)
+        if code == 1:
+            return code
         self.logger.info("authorizationPolicy.yaml已生成。")
         apply_command_list = ["kubectl apply -f %s" % policy_yaml]
         return apply_command_list

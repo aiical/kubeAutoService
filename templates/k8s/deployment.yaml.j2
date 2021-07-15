@@ -85,6 +85,7 @@ spec:
           value: -javaagent:/home/agent/skywalking-agent.jar=agent.service_name={{ serviceName }},agent.instance_name=$(POD_NAME)
         {% endif %}
         {# startupProbe #}
+        {% if startup is not none %}
         startupProbe:
           {% if startup.checkType == "httpGet" %}
           httpGet:
@@ -105,7 +106,9 @@ spec:
           initialDelaySeconds: {{ startup.initialDelaySeconds }}
           failureThreshold: {{ startup.failureThreshold }}
           periodSeconds: {{ startup.periodSeconds }}
+        {% endif %}
         {# readinessProbe #}
+        {% if readiness is not none %}
         readinessProbe:
           {% if readiness.checkType == "httpGet" %}
           httpGet:
@@ -126,7 +129,9 @@ spec:
           initialDelaySeconds: {{ readiness.initialDelaySeconds }}
           failureThreshold: {{ readiness.failureThreshold }}
           periodSeconds: {{ readiness.periodSeconds }}
+        {% endif %}
         {# livenessProbe #}
+        {% if liveness != {} %}
         livenessProbe:
           {% if liveness.checkType == "httpGet" %}
           httpGet:
@@ -147,6 +152,7 @@ spec:
           initialDelaySeconds: {{ liveness.initialDelaySeconds }}
           failureThreshold: {{ liveness.failureThreshold }}
           periodSeconds: {{ liveness.periodSeconds }}
+        {% endif %}
         {# lifecycle #}
         {% if lifecycle.postStartCommandList is not none or lifecycle.preStopCommandList is not none %}
         lifecycle:

@@ -96,54 +96,81 @@ class K8sOpera:
             logger.info("生成k8s资源清单serviceaccount.yaml")
             service_account = ServiceAccount(self.global_info, self.k8s_info, self.k8s_path)
             service_account_info = service_account.get_service_account_info()
-            start_command_list.extend(service_account.create_service_account_yaml(service_account_info))
+            tmp_command = service_account.create_service_account_yaml(service_account_info)
+            if isinstance(tmp_command, int) and tmp_command == 1:
+                return 1
+            start_command_list.extend(tmp_command)
             """生成service.yaml"""
             logger.info("生成k8s资源清单service.yaml")
             service = Service(self.global_info, self.k8s_info, self.k8s_path)
             service_info = service.get_service_info()
-            start_command_list.extend(service.create_service_yaml(service_info))
+            tmp_command = service.create_service_yaml(service_info)
+            if isinstance(tmp_command, int) and tmp_command == 1:
+                return 1
+            start_command_list.extend(tmp_command)
             if controller_type == "stateless":
                 """生成deployment.yaml"""
                 logger.info("生成k8s资源清单deployment.yaml")
                 deployment = Deployment(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
                 deployment_list = deployment.get_deployment_info()
-                start_command_list.extend(deployment.create_deployment_yaml(deployment_list))
+                tmp_command = deployment.create_deployment_yaml(deployment_list)
+                if isinstance(tmp_command, int) and tmp_command == 1:
+                    return 1
+                start_command_list.extend(tmp_command)
             elif controller_type == "stateful":
                 """生成statefulset.yaml"""
                 logger.info("生成k8s资源清单statefulset.yaml")
                 statefulset = StatefulSet(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
                 statefulset_list = statefulset.get_statefulset_info()
-                start_command_list.extend(statefulset.create_statefulset_yaml(statefulset_list))
+                tmp_command = statefulset.create_statefulset_yaml(statefulset_list)
+                if isinstance(tmp_command, int) and tmp_command == 1:
+                    return 1
+                start_command_list.extend(tmp_command)
 
                 service_info.update({
                     'ifHeadless': "Y"
                 })
-                start_command_list.extend(service.create_service_yaml(service_info))
+                tmp_command = statefulset.create_statefulset_yaml(statefulset_list)
+                if isinstance(tmp_command, int) and tmp_command == 1:
+                    return 1
+                start_command_list.extend(tmp_command)
 
             if server_type == "istio":
                 """生成gateway.yaml"""
                 logger.info("生成k8s资源清单gateway.yaml")
                 gateway = Gateway(self.global_info, self.k8s_info, self.k8s_path)
                 gateway_info = gateway.get_gateway_info()
-                start_command_list.extend(gateway.create_gateway_yaml(gateway_info))
+                tmp_command = gateway.create_gateway_yaml(gateway_info)
+                if isinstance(tmp_command, int) and tmp_command == 1:
+                    return 1
+                start_command_list.extend(tmp_command)
                 # if controller_type == "deployment":
                 """生成destinationrule.yaml"""
                 logger.info("生成k8s资源清单destinationrule.yaml")
                 destination_rule = DestinationRule(self.global_info, self.k8s_info, self.k8s_path)
                 destination_rule_info = destination_rule.get_destination_rule_info()
-                start_command_list.extend(destination_rule.create_destination_rule_yaml(destination_rule_info))
+                tmp_command = destination_rule.create_destination_rule_yaml(destination_rule_info)
+                if isinstance(tmp_command, int) and tmp_command == 1:
+                    return 1
+                start_command_list.extend(tmp_command)
 
                 """生成virtualservice.yaml"""
                 logger.info("生成k8s资源清单virtualservice.yaml")
                 virtual_service = VirtualService(self.global_info, self.k8s_info, self.k8s_path)
                 virtual_service_info = virtual_service.get_virtual_service_info()
-                start_command_list.extend(virtual_service.create_virtual_service_yaml(virtual_service_info))
+                tmp_command = virtual_service.create_virtual_service_yaml(virtual_service_info)
+                if isinstance(tmp_command, int) and tmp_command == 1:
+                    return 1
+                start_command_list.extend(tmp_command)
 
                 """生成authorizationPolicy.yaml"""
                 logger.info("生成k8s资源清单authorizationPolicy.yaml")
-                policy = AuthorizationPolicy(self.setting_conf, self.global_info, None, self.k8s_path)
+                policy = AuthorizationPolicy(self.setting_conf, self.global_info, self.k8s_path)
                 policy_info = policy.get_ap_ns_to_svc_info()
-                start_command_list.extend(policy.create_ns_to_svc_yaml(policy_info))
+                tmp_command = policy.create_ns_to_svc_yaml(policy_info)
+                if isinstance(tmp_command, int) and tmp_command == 1:
+                    return 1
+                start_command_list.extend(tmp_command)
 
             logger.info("启动服务命令列表如下")
             logger.info(start_command_list)

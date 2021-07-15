@@ -48,7 +48,9 @@ class Gateway:
         gateway_yaml_j2 = '%s/templates/k8s/gateway.yaml.j2' % sys.path[0]
         gateway_yaml = '%s/gateway.yaml' % self.k8s_path
 
-        j2_to_file("server", gateway_info, gateway_yaml_j2, gateway_yaml)
+        code = j2_to_file("server", gateway_info, gateway_yaml_j2, gateway_yaml)
+        if code == 1:
+            return code
         logger.info("gateway.yaml已生成。")
         apply_command_list = ["kubectl apply -f %s" % gateway_yaml]
         return apply_command_list
