@@ -21,6 +21,8 @@ class Gateway:
         # sys_name, service_name, namespace = set_run_env(run_env, sys_name, app_name)
         dc_name = self.global_info['dcName']
         is_pass_through = self.k8s_info['isPassThrough']
+        if sys_name == "itsm" and app_name == "web":
+            is_pass_through = "Y"
         """获取container信息"""
         container_info = self.k8s_info['container']
         port_info = container_info['portInfo']

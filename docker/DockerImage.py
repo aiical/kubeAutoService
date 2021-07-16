@@ -317,7 +317,9 @@ class DockerImage:
                         copy_info = "%s %s/%s/%s" % (file_name, tomcat_dest, tomcat_dir, file_dest)
                         copy_info.replace("//", "/")
                         tomcat_copy.append(copy_info)
-
+            tomcat_env = [
+                "TOMCAT_HOME %s/%s" % (tomcat_dest, tomcat_dir),
+            ]
             tmp_tomcat_run = "RUN chmod 777 %s/%s/bin/*.sh" % (tomcat_dest, tomcat_dir)
             tomcat_run = tmp_tomcat_run.replace("//", "/")
             tomcat_endpoint = "%s/%s/bin/catalina.sh run" % (tomcat_dest, tomcat_dir)
@@ -326,6 +328,7 @@ class DockerImage:
                 'tomcat_add': tomcat_add,
                 'tomcat_copy': tomcat_copy,
                 'tomcat_run': tomcat_run,
+                'tomcat_env': tomcat_env,
                 'tomcat_endpoint': tomcat_endpoint
             })
         return tomcat_dict
@@ -491,10 +494,12 @@ class DockerImage:
             tomcat_add = tomcat_dict['tomcat_add']
             tomcat_copy = tomcat_dict['tomcat_copy']
             tomcat_run = tomcat_dict['tomcat_run']
+            tomcat_env = tomcat_dict['tomcat_env']
             tomcat_endpoint = tomcat_dict['tomcat_endpoint']
         else:
             tomcat_add = []
             tomcat_copy = []
+            tomcat_env = []
             tomcat_run = ""
             tomcat_endpoint = ""
 
@@ -502,6 +507,9 @@ class DockerImage:
         env_list = []
         if jdk_env:
             env_list.extend(jdk_env)
+
+        if tomcat_env:
+            env_list.extend(tomcat_env)
 
         other_env = self.__get_env()
         if other_env:

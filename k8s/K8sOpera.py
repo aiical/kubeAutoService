@@ -89,8 +89,8 @@ class K8sOpera:
             """生成cronjob.yaml"""
             logger.info("生成k8s资源清单cronjob.yaml")
             cronjob = CronJob(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
-            cronjob_list = cronjob.get_cronjob_info()
-            start_command_list.extend(cronjob.create_cronjob_yaml(cronjob_list))
+            cronjob_list = cronjob.get_cron_job_info()
+            start_command_list.extend(cronjob.create_cron_job_yaml(cronjob_list))
         elif announce_type == "permanent":
             """生成serviceaccount.yaml"""
             logger.info("生成k8s资源清单serviceaccount.yaml")
@@ -121,8 +121,8 @@ class K8sOpera:
                 """生成statefulset.yaml"""
                 logger.info("生成k8s资源清单statefulset.yaml")
                 statefulset = StatefulSet(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
-                statefulset_list = statefulset.get_statefulset_info()
-                tmp_command = statefulset.create_statefulset_yaml(statefulset_list)
+                statefulset_list = statefulset.get_stateful_set_info()
+                tmp_command = statefulset.create_stateful_set_yaml(statefulset_list)
                 if isinstance(tmp_command, int) and tmp_command == 1:
                     return 1
                 start_command_list.extend(tmp_command)
@@ -130,7 +130,7 @@ class K8sOpera:
                 service_info.update({
                     'ifHeadless': "Y"
                 })
-                tmp_command = statefulset.create_statefulset_yaml(statefulset_list)
+                tmp_command = statefulset.create_stateful_set_yaml(statefulset_list)
                 if isinstance(tmp_command, int) and tmp_command == 1:
                     return 1
                 start_command_list.extend(tmp_command)

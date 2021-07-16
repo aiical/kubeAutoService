@@ -201,6 +201,8 @@ kubernetes:
   - ip: 198.19.1.100
     hostName: mail.chinaums.com
 
+  schedule:
+
   # 选填
   # 节点选择器
   # 必须是存在的节点标签
