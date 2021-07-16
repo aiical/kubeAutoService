@@ -44,15 +44,12 @@ class ConfigMap:
         logger = Logger("server")
         logger.info("开始获取应用-configmap信息")
         cm_app_list = []
-        # run_env = self.global_info['runEnv']
         sys_name = self.global_info['sysName']
         app_name = self.global_info['appName']
         """获取服务名和名称空间"""
-        # sys_name, service_name, namespace = set_run_env(run_env, sys_name, app_name)
         service_name, namespace = set_ns_svc(sys_name, app_name)
         config_map_list = self.k8s_info['container']['volume']['configMap']
         for config_map in config_map_list:
-            # name = config_map['name']
             file_name = config_map['fileName']
             tmp_name = ''.join(list(filter(str.isalnum, file_name))).lower()
             name = "%s-%s" % (service_name, tmp_name)
@@ -75,13 +72,13 @@ class ConfigMap:
 
     def create_config_map_file_beat_yaml(self, cm_file_beat):
         logger = Logger("server")
-        logger.info("开始创建configmap-filebeat.yaml")
-        logger.info("configmap-filebeat配置如下：")
+        logger.info("开始创建configMap-fileBeat.yaml")
+        logger.info("configMap-fileBeat配置如下：")
         logger.info(cm_file_beat)
-        cm_file_beat_yaml_j2 = '%s/templates/k8s/configmap-filebeat.yaml.j2' % sys.path[0]
-        cm_file_beat_yaml = '%s/configmap-filebeat.yaml' % self.k8s_path
+        cm_file_beat_yaml_j2 = '%s/templates/k8s/configMap-fileBeat.yaml.j2' % sys.path[0]
+        cm_file_beat_yaml = '%s/configMap-fileBeat.yaml' % self.k8s_path
         j2_to_file("server", cm_file_beat, cm_file_beat_yaml_j2, cm_file_beat_yaml)
-        logger.info("configmap-filebeat.yaml已生成。")
+        logger.info("configMap-fileBeat.yaml已生成。")
         apply_command_list = ["kubectl apply -f %s" % cm_file_beat_yaml]
         return apply_command_list
 
@@ -90,12 +87,12 @@ class ConfigMap:
         logger = Logger("server")
         for cm in cm_app_list:
             name = cm['name']
-            logger.info("开始创建configmap-%s.yaml" % name)
-            logger.info("configmap-%s配置如下：" % name)
+            logger.info("开始创建configMap-%s.yaml" % name)
+            logger.info("configMap-%s配置如下：" % name)
             logger.info(cm)
-            cm_yaml_j2 = '%s/templates/k8s/configmap-default.yaml.j2' % sys.path[0]
-            cm_yaml = '%s/configmap-%s.yaml' % (self.k8s_path, name)
+            cm_yaml_j2 = '%s/templates/k8s/configMap-default.yaml.j2' % sys.path[0]
+            cm_yaml = '%s/configMap-%s.yaml' % (self.k8s_path, name)
             j2_to_file("server", cm, cm_yaml_j2, cm_yaml)
-            logger.info("configmap-%s.yaml已生成。" % name)
+            logger.info("configMap-%s.yaml已生成。" % name)
             apply_command_list.append("kubectl apply -f %s" % cm_yaml)
         return apply_command_list

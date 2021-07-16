@@ -1,14 +1,11 @@
 #!/usr/local/python374/bin/python3.7
 # -*- coding: utf-8 -*-
 import os
-import json
 import time
 import traceback
 from docker.DockerImage import DockerImage
 from k8s.InitProject import InitProject
 from k8s.K8sOpera import K8sOpera
-from publicClass.Logger import Logger
-from publicClass.JsonCheck import exchange_json
 from publicClass.PublicFunc import set_ns_svc, get_files, shell_cmd, send_state_back
 
 

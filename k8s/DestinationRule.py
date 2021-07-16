@@ -50,15 +50,15 @@ class DestinationRule:
 
     def create_destination_rule_yaml(self, destination_rule_info):
         logger = Logger("server")
-        logger.info("开始创建destinationrule.yaml")
-        logger.info("destinationrule配置如下：")
+        logger.info("开始创建destinationRule.yaml")
+        logger.info("destinationRule配置如下：")
         logger.info(destination_rule_info)
-        destination_rule_yaml_j2 = '%s/templates/k8s/destinationrule.yaml.j2' % sys.path[0]
-        destination_rule_yaml = '%s/destinationrule.yaml' % self.k8s_path
+        destination_rule_yaml_j2 = '%s/templates/k8s/destinationRule.yaml.j2' % sys.path[0]
+        destination_rule_yaml = '%s/destinationRule.yaml' % self.k8s_path
 
         code = j2_to_file("server", destination_rule_info, destination_rule_yaml_j2, destination_rule_yaml)
         if code == 1:
             return code
-        logger.info("destinationrule.yaml已生成。")
+        logger.info("destinationRule.yaml已生成。")
         apply_command_list = ["kubectl apply -f %s" % destination_rule_yaml]
         return apply_command_list

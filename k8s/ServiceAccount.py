@@ -29,15 +29,15 @@ class ServiceAccount:
 
     def create_service_account_yaml(self, service_account_info):
         logger = Logger("server")
-        logger.info("开始创建serviceaccount.yaml")
+        logger.info("开始创建serviceAccount.yaml")
         logger.info("ServiceAccount配置如下：")
         logger.info(service_account_info)
-        service_account_yaml_j2 = '%s/templates/k8s/serviceaccount.yaml.j2' % sys.path[0]
-        service_account_yaml = '%s/serviceaccount.yaml' % self.k8s_path
+        service_account_yaml_j2 = '%s/templates/k8s/serviceAccount.yaml.j2' % sys.path[0]
+        service_account_yaml = '%s/serviceAccount.yaml' % self.k8s_path
 
         code = j2_to_file("server", service_account_info, service_account_yaml_j2, service_account_yaml)
         if code == 1:
             return code
-        logger.info("serviceaccount.yaml已生成。")
+        logger.info("serviceAccount.yaml已生成。")
         apply_command_list = ["kubectl apply -f %s" % service_account_yaml]
         return apply_command_list

@@ -19,9 +19,6 @@ class DockerImage:
         """读取settings设置"""
         conf = settings_conf
 
-        self.tomcat_conf = sys.path[0] + '/conf/tomcat_version.yaml'
-        self.jdk_conf = sys.path[0] + '/conf/jdk_version.yaml'
-
         """生产Dockerfile、介质存放地址"""
         self.sys_name = self.global_info['sysName']
         self.app_name = self.global_info['appName']

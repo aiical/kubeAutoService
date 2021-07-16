@@ -68,15 +68,15 @@ class VirtualService:
 
     def create_virtual_service_yaml(self, virtual_service_info):
         logger = Logger("server")
-        logger.info("开始创建virtualservice.yaml")
-        logger.info("virtualservice配置如下：")
+        logger.info("开始创建virtualService.yaml")
+        logger.info("virtualService配置如下：")
         logger.info(virtual_service_info)
-        virtual_service_yaml_j2 = '%s/templates/k8s/virtualservice.yaml.j2' % sys.path[0]
-        virtual_service_yaml = '%s/virtualservice.yaml' % self.k8s_path
+        virtual_service_yaml_j2 = '%s/templates/k8s/virtualService.yaml.j2' % sys.path[0]
+        virtual_service_yaml = '%s/virtualService.yaml' % self.k8s_path
 
         code = j2_to_file("server", virtual_service_info, virtual_service_yaml_j2, virtual_service_yaml)
         if code == 1:
             return code
-        logger.info("virtualservice.yaml已生成。")
+        logger.info("virtualService.yaml已生成。")
         apply_command_list = ["kubectl apply -f %s" % virtual_service_yaml]
         return apply_command_list
