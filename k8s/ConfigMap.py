@@ -12,9 +12,9 @@ class ConfigMap:
         self.k8s_path = k8s_path
         self.media_path = media_path
         self.object_storage_conf = settings_conf['objectStorage']
-        self.file_beat_version = str(settings_conf['filebeatDefaults']['version'])
-        self.log_kafka_info = settings_conf['filebeatDefaults']['kafkaInfo']
-        self.log_stash_host = settings_conf['filebeatDefaults']['logstashHost']
+        self.file_beat_version = str(settings_conf['fileBeatDefaults']['version'])
+        self.log_kafka_info = settings_conf['fileBeatDefaults']['kafkaInfo']
+        self.log_stash_host = settings_conf['fileBeatDefaults']['logStashHost']
 
     def get_config_map_file_beat_info(self):
         logger = Logger("server")

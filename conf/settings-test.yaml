@@ -26,9 +26,9 @@ harborInfo:
   host: 10.11.114.35
   user: admin
   password: Harbor12345
-filebeatDefaults:
+fileBeatDefaults:
   version: 7.9.1
-  logstashHost:
+  logStashHost:
   - 10.11.114.111
 skyWalkingDefaults:
   host: 10.11.114.68

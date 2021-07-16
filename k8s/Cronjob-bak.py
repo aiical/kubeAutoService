@@ -16,7 +16,7 @@ class CronJob:
         self.harbor_ip = conf['harborInfo']['host']
         # self.app_repository = "%s/app" % self.harbor_ip
         self.library_repository = "%s/library" % self.harbor_ip
-        self.file_beat_version = str(conf['filebeatDefaults']['version'])
+        self.file_beat_version = str(conf['fileBeatDefaults']['version'])
         
     def get_cronjob_info(self):
         logger = Logger("server")
@@ -145,7 +145,7 @@ class CronJob:
         """合并cronjob部署config字典"""
         cronjob_info.update({
             'fileBeatFlag': file_beat_flag,
-            'filebeatVersion': self.file_beat_version,
+            'fileBeatVersion': self.file_beat_version,
             'serviceName': service_name,
             'namespace': namespace,
             'imageFullName': image_full_name,

@@ -15,10 +15,10 @@ class StatefulSet:
         """仓库信息"""
         self.harbor_ip = conf['harborInfo']['host']
         self.library_repository = "%s/library" % self.harbor_ip
-        self.file_beat_version = str(conf['filebeatDefaults']['version'])
-        self.log_stash_host = conf['filebeatDefaults']['logstashHost']
+        self.file_beat_version = str(conf['fileBeatDefaults']['version'])
+        self.log_stash_host = conf['fileBeatDefaults']['logStashHost']
         self.sky_walking_host = conf['skyWalkingDefaults']['host']
-        self.log_kafka_info = settings_conf['filebeatDefaults']['kafkaInfo']
+        self.log_kafka_info = settings_conf['fileBeatDefaults']['kafkaInfo']
 
     def get_statefulset_info(self):
         logger = Logger("server")
@@ -152,7 +152,7 @@ class StatefulSet:
         """合并deployment部署config字典"""
         statefulset_info.update({
             'fileBeatFlag': file_beat_flag,
-            'filebeatVersion': self.file_beat_version,
+            'fileBeatVersion': self.file_beat_version,
             'serviceName': service_name,
             'namespace': namespace,
             'imageFullName': image_full_name,

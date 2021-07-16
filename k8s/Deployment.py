@@ -17,7 +17,6 @@ class Deployment(Controller):
         Controller.get_volume_info(self, "stateless")
         Controller.get_pod_live_info(self)
         Controller.get_if_istio_ip(self)
-
         """获取版本个数"""
         version_count = int(self.k8s_info['versionCount'])
         cnt_range = int(version_count + 1)

@@ -208,16 +208,16 @@ spec:
       {# fileBeat容器 #}
       {% if fileBeatFlag == "Y" %}
       - name: filebeat
-        image: {{ libraryRepository }}/filebeat:{{ filebeatVersion }}
+        image: {{ libraryRepository }}/filebeat:{{ fileBeatVersion }}
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: app-logs
           mountPath: /logs
         - name: filebeat-path
-          mountPath: /home/filebeat-{{ filebeatVersion }}-linux-x86_64/configs/path.yml
+          mountPath: /home/filebeat-{{ fileBeatVersion }}-linux-x86_64/configs/path.yml
           subPath: path.yml
         - name: filebeat-conf
-          mountPath: /home/filebeat-{{ filebeatVersion }}-linux-x86_64/filebeat.yml
+          mountPath: /home/filebeat-{{ fileBeatVersion }}-linux-x86_64/filebeat.yml
           subPath: filebeat.yml
       {% endif %}
       {# volumes #}

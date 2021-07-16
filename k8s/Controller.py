@@ -20,11 +20,11 @@ class Controller:
             self.harbor_ip = settings_conf['harborInfo']['host']
             self.library_repository = "%s/library" % self.harbor_ip
             self.file_beat_flag = self.global_info['fileBeatFlag']
-            self.file_beat_version = str(settings_conf['filebeatDefaults']['version'])
-            self.log_stash_host = settings_conf['filebeatDefaults']['logstashHost']
+            self.file_beat_version = str(settings_conf['fileBeatDefaults']['version'])
+            self.log_stash_host = settings_conf['fileBeatDefaults']['logStashHost']
             self.sky_walking_host = str(settings_conf['skyWalkingDefaults']['host'])
             self.sky_walking_flag = self.global_info['skyWalking']['flag']
-            self.log_kafka_info = settings_conf['filebeatDefaults']['kafkaInfo']
+            self.log_kafka_info = settings_conf['fileBeatDefaults']['kafkaInfo']
         except(KeyError, NameError):
             self.logger.error(traceback.format_exc())
 
@@ -66,7 +66,7 @@ class Controller:
         else:
             self.controller_info.update({
                 'fileBeatFlag': self.file_beat_flag,
-                'filebeatVersion': self.file_beat_version,
+                'fileBeatVersion': self.file_beat_version,
                 'skyWalkingFlag': self.sky_walking_flag,
                 'serviceName': self.service_name,
                 'namespace': self.namespace,
@@ -237,7 +237,7 @@ class Controller:
                 if self.sky_walking_flag == "Y":
                     str_istio_white_ip += "%s/32," % self.sky_walking_host
                 if self.file_beat_flag == "Y":
-                    if compared_version(self.file_beat_flag, "7.9.2") == -1:
+                    if compared_version(self.file_beat_version, "7.9.2") == -1:
                         for item in self.log_stash_host:
                             str_istio_white_ip += "%s/32," % str(item["host"])
                     else:
@@ -248,7 +248,7 @@ class Controller:
                 self.controller_info.update({
                     "istioWhiteIp": str_istio_white_ip
                 })
-        except(KeyError, NameError):
+        except(KeyError, NameError, ValueError):
             self.logger.error(traceback.format_exc())
 
     def get_cron_job_schedule(self):

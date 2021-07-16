@@ -27,7 +27,7 @@ harborInfo:
   host: 10.3.143.63
   user: admin
   password: Harbor12345
-filebeatDefaults:
+fileBeatDefaults:
   version: 7.9.2
   kafkaInfo:
   - host: 10.3.143.106
@@ -36,7 +36,7 @@ filebeatDefaults:
     port: 9093
   - host: 10.3.143.108
     port: 9093
-  logstashHost:
+  logStashHost:
   - host: 10.3.134.50
     port: 5044
 skyWalkingDefaults:
