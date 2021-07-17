@@ -548,13 +548,6 @@ class DockerImage:
 
         """ENTRYPOINT"""
         other_entry_point = self.__get_entry_point()
-        # str_entry_point = ""
-        # if other_entry_point:
-        #     str_entry_point += other_entry_point + " && "
-        # if tomcat_endpoint:
-        #     str_entry_point += tomcat_endpoint + " && "
-        # if str_entry_point:
-        #     str_entry_point = str_entry_point[:-4]
         if tomcat_endpoint:
             str_entry_point = tomcat_endpoint
         else:

@@ -1,5 +1,6 @@
 #!/usr/local/python374/bin/python3.7
 # -*- coding: utf-8 -*-
+import copy
 import traceback
 from publicClass.Logger import Logger
 from publicClass.PublicFunc import compared_version, set_ns_svc
@@ -225,24 +226,35 @@ class Controller:
             })
             if server_type == "istio":
                 istio_info = self.k8s_info["serverType"]['istio']
-                istio_white_ip_list = istio_info["whiteIpList"]
+                user_set_istio_white_ip_list = istio_info["whiteIpList"]
                 etc_host_ip = self.k8s_info['hostInfo']
                 str_istio_white_ip = ""
-                if istio_white_ip_list is not None:
-                    for ip in istio_white_ip_list:
-                        str_istio_white_ip += "%s/32," % str(ip)
+                tmp_total_istio_white_ip_list = []
+                if user_set_istio_white_ip_list is not None:
+                    tmp_total_istio_white_ip_list.extend(user_set_istio_white_ip_list)
+                    # for ip in istio_white_ip_list:
+                    #     str_istio_white_ip += "%s/32," % str(ip)
                 if etc_host_ip:
                     for item in etc_host_ip:
-                        str_istio_white_ip += "%s/32," % item['ip']
+                        tmp_total_istio_white_ip_list.append(copy.deepcopy(item['ip']))
+                        # str_istio_white_ip += "%s/32," % item['ip']
                 if self.sky_walking_flag == "Y":
-                    str_istio_white_ip += "%s/32," % self.sky_walking_host
+                    tmp_total_istio_white_ip_list.append(self.sky_walking_host)
+                    # str_istio_white_ip += "%s/32," % self.sky_walking_host
                 if self.file_beat_flag == "Y":
                     if compared_version(self.file_beat_version, "7.9.2") == -1:
                         for item in self.log_stash_host:
-                            str_istio_white_ip += "%s/32," % str(item["host"])
+                            tmp_total_istio_white_ip_list.append(copy.deepcopy(str(item["host"])))
+                            # str_istio_white_ip += "%s/32," % str(item["host"])
                     else:
                         for item in self.log_kafka_info:
-                            str_istio_white_ip += "%s/32," % str(item["host"])
+                            tmp_total_istio_white_ip_list.append(copy.deepcopy(str(item["host"])))
+                            # str_istio_white_ip += "%s/32," % str(item["host"])
+
+                total_istio_white_ip_list = list(set(tmp_total_istio_white_ip_list))
+                if total_istio_white_ip_list:
+                    for ip in total_istio_white_ip_list:
+                        str_istio_white_ip += "%s/32," % ip
                 if str_istio_white_ip != "":
                     str_istio_white_ip = str_istio_white_ip[:-1]
                 self.controller_info.update({

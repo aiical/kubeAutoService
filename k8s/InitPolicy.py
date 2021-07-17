@@ -1,7 +1,5 @@
 #!/usr/local/python374/bin/python3.7
 # -*- coding: utf-8 -*-
-import traceback
-from publicClass.Logger import Logger
 import os
 from k8s.InitProject import InitProject
 from publicClass.PublicFunc import send_state_back
