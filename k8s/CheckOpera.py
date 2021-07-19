@@ -154,6 +154,16 @@ class CheckOpera:
         else:
             container_statuses = []
 
+        container_cnt = len(container_statuses)
+        if container_cnt == 0:
+            ready_status = ""
+        else:
+            ready_cnt = 0
+            for status in container_statuses:
+                ready = str(status['ready'])
+                if ready == "True":
+                    ready_cnt += 1
+            ready_status = "ready(%s/%s)" % (str(ready_cnt), str(container_cnt))
         pod_info = {
             'name': pod_name,
             'namespace': namespace,
@@ -163,9 +173,10 @@ class CheckOpera:
             'nodeSelector': node_selector,
             'hostIP': host_ip,
             'podIP': pod_ip,
-            'status': pod_status,
+            'status': "%s  %s" % (pod_status, ready_status),
             'initContainerStatuses': init_container_statuses,
-            'containerStatuses': container_statuses
+            'containerStatuses': container_statuses,
+            # 'readyStatus': ready_status
         }
         return pod_info
 
