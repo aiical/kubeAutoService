@@ -1,7 +1,9 @@
 #!/usr/local/python374/bin/python3.7
 # -*- coding: utf-8 -*-
-from publicClass.Logger import Logger
 import traceback
+from flask import abort
+from publicClass.Logger import Logger
+from publicClass.PublicFunc import send_state_back
 
 
 def check_json(post_json_data):
@@ -23,7 +25,7 @@ def check_json(post_json_data):
     resource_data = para_data['kube']
 
 
-def exchange_json(para_data):
+def exchange_json(para_data, task_back_url, task_flow_id):
     logger = Logger("server")
     try:
         str_sys_name = para_data['global']['sysName']
@@ -34,6 +36,8 @@ def exchange_json(para_data):
         str_run_env = para_data['global']['runEnv']
         tmp_run_env = str_run_env.lower()
         para_data['global'].update({
+            'taskBackUrl': task_back_url,
+            'taskFlowId': task_flow_id,
             'runEnv': str(tmp_run_env),
             'sysName': str(tmp_sys_name),
             'appName': str(tmp_app_name)
@@ -47,8 +51,13 @@ def exchange_json(para_data):
         para_data['global'].update({
             'appContext': text_context
         })
+        send_state_back(task_back_url, task_flow_id, 2, 3,
+                        "[INFO]：发布json预处理成功")
         return para_data
     except (KeyError, NameError):
         logger.error(traceback.format_exc())
-        return 1
+        send_state_back(task_back_url, task_flow_id, 5, 5,
+                        "[ERROR]：发布json预处理失败,具体异常：%s" % traceback.format_exc())
+        # return 1
+        abort(404)
 

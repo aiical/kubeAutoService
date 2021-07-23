@@ -76,8 +76,6 @@ class K8sOpera:
             cm_file_beat = config_map.get_config_map_file_beat_info()
             start_command_list.extend(config_map.create_config_map_file_beat_yaml(cm_file_beat))
         cm_app = config_map.get_config_map_app_info()
-        if cm_app == 1:
-            return 1
         start_command_list.extend(config_map.create_config_map_app_yaml(cm_app))
         if announce_type == "once":
             """生成job.yaml"""

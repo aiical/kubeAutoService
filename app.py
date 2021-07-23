@@ -47,11 +47,12 @@ def run_auto_deploy_app_tasks():
 
 def run_app_task(post_json_data):
     app_task = InitApp(setting_conf, post_json_data)
-    check_code = app_task.check()
-    if check_code == 1:
-        return 1
-    else:
-        return app_task.deploy()
+    app_task.check()
+    app_task.deploy()
+    # if check_code == 1:
+    #     return 1
+    # else:
+    #     return app_task.deploy()
 
 
 @app.route('/auto/runSys', methods=["POST"])
@@ -77,11 +78,12 @@ def run_auto_opera_app_tasks():
 
 def opera_app_task(post_json_data):
     app_task = InitApp(setting_conf, post_json_data)
-    check_code = app_task.check()
-    if check_code == 1:
-        return 1
-    else:
-        return app_task.opera()
+    app_task.check()
+    app_task.opera()
+    # if check_code == 1:
+    #     return 1
+    # else:
+    #     return app_task.opera()
 
 
 @app.route('/auto/setAccess', methods=["POST"])

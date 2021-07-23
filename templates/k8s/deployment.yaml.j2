@@ -85,7 +85,7 @@ spec:
           value: -javaagent:/home/agent/skywalking-agent.jar=agent.service_name={{ serviceName }},agent.instance_name=$(POD_NAME)
         {% endif %}
         {# startupProbe #}
-        {% if startup is not none %}
+        {% if startup != {} %}
         startupProbe:
           {% if startup.checkType == "httpGet" %}
           httpGet:
@@ -108,7 +108,7 @@ spec:
           periodSeconds: {{ startup.periodSeconds }}
         {% endif %}
         {# readinessProbe #}
-        {% if readiness is not none %}
+        {% if readiness != {} %}
         readinessProbe:
           {% if readiness.checkType == "httpGet" %}
           httpGet:
@@ -226,6 +226,13 @@ spec:
       - name: filebeat
         image: {{ libraryRepository }}/filebeat:{{ fileBeatVersion }}
         imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 500Mi
         volumeMounts:
         - name: app-logs
           mountPath: /logs

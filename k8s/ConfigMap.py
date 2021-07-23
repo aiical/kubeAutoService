@@ -1,16 +1,20 @@
 #!/usr/local/python374/bin/python3.7
 # -*- coding: utf-8 -*-
 import sys
+from flask import abort
 from publicClass.Logger import Logger
-from publicClass.PublicFunc import j2_to_file, set_ns_svc, get_remote_file, compared_version
+from publicClass.PublicFunc import j2_to_file, set_ns_svc, get_remote_file, compared_version, send_state_back
 
 
 class ConfigMap:
     def __init__(self, settings_conf, global_info, k8s_info, k8s_path, media_path):
+        self.logger = Logger("server")
         self.global_info = global_info
         self.k8s_info = k8s_info
         self.k8s_path = k8s_path
         self.media_path = media_path
+        self.task_back_url = global_info['taskBackUrl']
+        self.task_flow_id = global_info['taskFlowId']
         self.object_storage_conf = settings_conf['objectStorage']
         self.file_beat_version = str(settings_conf['fileBeatDefaults']['version'])
         self.log_kafka_info = settings_conf['fileBeatDefaults']['kafkaInfo']
@@ -58,8 +62,10 @@ class ConfigMap:
             file_full_name = "%s/%s" % (self.media_path, file_name)
             file_full_name = file_full_name.replace("//", "/")
             logger.info("从对象存储获取configmap文件%s" % file_name)
-            if get_remote_file("server", self.object_storage_conf, key, md5_code, file_full_name) == 1:
-                return 1
+            if not get_remote_file("server", self.object_storage_conf, key, md5_code, file_full_name):
+                send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                                "[ERROR]：从对象存储获取configmap文件%s失败" % file_name)
+                abort(404)
             config_map_info = {
                 'name': name,
                 'namespace': namespace,

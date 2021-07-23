@@ -7,6 +7,7 @@ import yaml
 import asyncio
 import subprocess
 import hashlib
+from flask import abort
 from publicClass.Logger import Logger
 from pathlib import Path
 import paramiko
@@ -36,15 +37,13 @@ def shell_cmd(log_type, str_cmd):
     cmd.stdout.close()
     str_stderr = cmd.stderr.read().decode()
     cmd.stderr.close()
-    code = 0
     if str_stdout:
         logger.info("\n" + str_stdout)
-        code = 0
     if str_stderr:
         logger.error("\n" + str_stderr)
         logger.error("报错退出...")
-        code = 1
-    return code
+        return False
+    return True
 
 
 def ssh_shell_cmd(log_type, host, str_cmd):
@@ -88,11 +87,11 @@ def j2_to_file(log_type, config, file_j2, file_yaml):
         out = template.render(config)
         with open(file_yaml, "w", encoding="utf-8") as f:
             f.write(out)
-        return 0
+        return True
     except Exception:
         logger.info("j2模板转换失败，报错如下")
         logger.error(traceback.format_exc())
-        return 1
+        return False
 
 
 def set_ns_svc(sys_name, app_name):
@@ -141,13 +140,13 @@ def get_remote_file(log_type, object_storage_conf, file_key, file_md5, file_full
             current_md5 = hashlib.md5(f.read()).hexdigest()
             if file_md5 != current_md5:
                 logger.error("文件%s下载失败,md5码不一致" % file_full_name)
-                return 1
+                return False
             else:
                 logger.info("文件%s比较md5码一致" % file_full_name)
     else:
         logger.error("文件%s下载失败" % file_full_name)
-        return 1
-    return 0
+        return False
+    return True
 
 
 def get_files(file_dir, suffix):

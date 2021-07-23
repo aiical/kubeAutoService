@@ -35,7 +35,7 @@ class Gateway:
             'protocol': protocol
         }
         if protocol == "tcp":
-            tcp_port_num = port_info['tcp']['tcpPortNum']
+            tcp_port_num = port_info['protocolContent']['tcpPortNum']
             gateway_info.update({
                 'tcpPortNum': tcp_port_num
             })
