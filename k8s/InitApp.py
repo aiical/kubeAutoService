@@ -57,13 +57,7 @@ class InitApp(InitProject):
             # current_task_step += 1
 
             str_image_final = DockerImage.create_full_image_name(image_info)
-            # tag_final = "v20201214.0"
-            if isinstance(str_image_final, int) and str_image_final == 1:
-                send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
-                                "[ERROR]：应用镜像名创建失败")
-                self.logger.error("生成镜像全名失败")
-                self.logger.error("错误退出程序")
-                return 1
+
             self.logger.info("本次发布应用镜像全名为：%s" % str_image_final)
             send_state_back(self.task_back_url, self.task_flow_id, 2, 3,
                             "[INFO]：应用镜像名创建成功[%s]" % str_image_final)
@@ -152,23 +146,18 @@ class InitApp(InitProject):
                 self.logger.info("k8s部分:")
                 k8s_opera = K8sOpera(self.settings_conf, global_config, k8s_config)
                 # current_task_step += 1
-                if k8s_opera.create_resource_yaml() == 1:
-                    send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
-                                    "[ERROR]：k8s资源清单创建出错")
-                    abort(404)
-                    # return 1
+                k8s_opera.create_resource_yaml()
                 send_state_back(self.task_back_url, self.task_flow_id, 2, 3,
                                 "[INFO]：k8s资源清单创建成功")
                 # print("k8s资源清单创建成功")
-
             else:
-                self.logger.info("无k8s资源部署")
-
-            time.sleep(10)
+                self.logger.warn("无k8s资源部署")
+                send_state_back(self.task_back_url, self.task_flow_id, 3, 3,
+                                "[FINISH WHIT WARN]：无k8s资源部署")
+            time.sleep(2)
             send_state_back(self.task_back_url, self.task_flow_id, 3, 3,
                             "[FINISH]：应用发布成功")
             self.logger.info("本次发布完成...")
-            # return 0
 
     def opera(self):
         try:
@@ -208,19 +197,16 @@ class InitApp(InitProject):
 
                 matchers = ['deployment', 'statefulset', 'job', 'cronjob']
                 matching = [s for s in k8s_current_yaml_file if any(xs in s for xs in matchers)]
-                code = True
                 for yaml_file in matching:
                     cmd_line = "kubectl delete -f %s" % yaml_file
-                    code = code and shell_cmd("server", cmd_line)
-                if code is False:
-                    self.logger.error("服务停止出错")
-                    send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
-                                    "[ERROR]：服务停止出错")
-                    abort(404)
-                else:
-                    self.logger.info("服务停止成功")
-                    send_state_back(self.task_back_url, self.task_flow_id, 3, 3,
-                                    "[FINISH]：服务停止成功")
+                    if not shell_cmd("server", cmd_line):
+                        send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                                        "[ERROR]:COMMAND:%s执行出错" % cmd_line)
+                        abort(404)
+
+                self.logger.info("服务停止成功")
+                send_state_back(self.task_back_url, self.task_flow_id, 3, 3,
+                                "[FINISH]：服务停止成功")
                 # return code
             elif opera_type == "5":
                 self.logger.info("启动服务")
@@ -262,22 +248,18 @@ class InitApp(InitProject):
                     send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
                                     "[ERROR]：应用环境回收出错,目录[%s]下不存在k8s资源清单" % k8s_path)
                     abort(404)
-                    # return 1
-                code = True
                 for yaml_file in k8s_current_yaml_file:
                     cmd_line = "kubectl delete -f %s" % yaml_file
-                    code = code and shell_cmd("server", cmd_line)
-                if code is False:
-                    self.logger.error("应用环境回收出错")
-                    send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
-                                    "[ERROR]：应用环境回收出错")
-                    abort(404)
-                else:
-                    self.logger.info("应用环境回收成功")
-                    send_state_back(self.task_back_url, self.task_flow_id, 3, 3,
-                                    "[FINISH]：应用环境回收成功")
+                    if not shell_cmd("server", cmd_line):
+                        send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                                        "[ERROR]:COMMAND:%s执行出错" % cmd_line)
+                        abort(404)
+
+                self.logger.info("应用环境回收成功")
+                send_state_back(self.task_back_url, self.task_flow_id, 3, 3,
+                                "[FINISH]：应用环境回收成功")
                 # return code
             else:
                 self.logger.warn("无效操作码")
                 send_state_back(self.task_back_url, self.task_flow_id, 3, 3,
-                                "[WARN]：无效操作码")
+                                "[FINISH WHIT WARN]：无效操作码")

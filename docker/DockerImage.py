@@ -18,56 +18,59 @@ class DockerImage:
         try:
             self.task_back_url = global_info['taskBackUrl']
             self.task_flow_id = global_info['taskFlowId']
-            self.global_info = global_info
-            self.docker_info = docker_info['newImage']
-
-            """生产Dockerfile、介质存放地址"""
-            self.sys_name = self.global_info['sysName']
-            self.app_name = self.global_info['appName']
-
-            self.image_full_name = self.global_info['imageFullName']
-
-            """获取服务名和名称空间"""
-            self.service_name, namespace = set_ns_svc(self.sys_name, self.app_name)
-
-            deploy_base_path = settings_conf['pathInfo']['deployBasePath']
-
-            self.docker_path = "%s/%s/%s/DockerImage" % (deploy_base_path, self.sys_name, self.service_name)
-            self.docker_path = self.docker_path.replace("//", "/")
-
-            """仓库信息"""
-            self.harbor_ip = settings_conf['harborInfo']['host']
-            self.harbor_user = settings_conf['harborInfo']['user']
-            self.harbor_password = settings_conf['harborInfo']['password']
-
-            """工具介质路径"""
-            self.tool_path = settings_conf['pathInfo']['toolPath']
-
-            self.object_storage_conf = settings_conf['objectStorage']
         except(KeyError, NameError):
             self.logger.error(traceback.format_exc())
-            send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
-                            "[ERROR]：%s" % traceback.format_exc())
             abort(404)
+        else:
+            try:
+                self.global_info = global_info
+                self.docker_info = docker_info['newImage']
 
-        """备份全有dockerfile目录
-        DockerImage_yyyymmddHh24miss
-        """
+                """生产Dockerfile、介质存放地址"""
+                self.sys_name = self.global_info['sysName']
+                self.app_name = self.global_info['appName']
 
-        dir_bak_time = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
-        docker_bak_path = self.docker_path + '_' + dir_bak_time
-        if os.path.exists(self.docker_path):
-            str_cmd = "mv %s %s" % (self.docker_path, docker_bak_path)
-            self.logger.info("备份目录%s到%s" % (self.docker_path, docker_bak_path))
-            self.logger.info("COMMAND: %s" % str_cmd)
-            if not shell_cmd("server", str_cmd):
+                self.image_full_name = self.global_info['imageFullName']
+
+                """获取服务名和名称空间"""
+                self.service_name, namespace = set_ns_svc(self.sys_name, self.app_name)
+
+                deploy_base_path = settings_conf['pathInfo']['deployBasePath']
+
+                self.docker_path = "%s/%s/%s/DockerImage" % (deploy_base_path, self.sys_name, self.service_name)
+                self.docker_path = self.docker_path.replace("//", "/")
+
+                """仓库信息"""
+                self.harbor_ip = settings_conf['harborInfo']['host']
+                self.harbor_user = settings_conf['harborInfo']['user']
+                self.harbor_password = settings_conf['harborInfo']['password']
+
+                """工具介质路径"""
+                self.tool_path = settings_conf['pathInfo']['toolPath']
+
+                self.object_storage_conf = settings_conf['objectStorage']
+            except(KeyError, NameError):
+                self.logger.error(traceback.format_exc())
                 send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
-                                "[ERROR]:COMMAND:%s执行出错" % str_cmd)
+                                "[ERROR]：%s" % traceback.format_exc())
                 abort(404)
+            else:
+                """备份全有dockerfile目录
+                DockerImage_yyyymmddHh24miss
+                """
 
-        os.makedirs(self.docker_path)
+                dir_bak_time = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
+                docker_bak_path = self.docker_path + '_' + dir_bak_time
+                if os.path.exists(self.docker_path):
+                    str_cmd = "mv %s %s" % (self.docker_path, docker_bak_path)
+                    self.logger.info("备份目录%s到%s" % (self.docker_path, docker_bak_path))
+                    self.logger.info("COMMAND: %s" % str_cmd)
+                    if not shell_cmd("server", str_cmd):
+                        send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                                        "[ERROR]:COMMAND:%s执行出错" % str_cmd)
+                        abort(404)
 
-
+                os.makedirs(self.docker_path)
 
     """docker镜像属性
     docker镜像所需属性，用于build，tag，push动作

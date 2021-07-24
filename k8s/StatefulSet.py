@@ -1,8 +1,10 @@
 #!/usr/local/python374/bin/python3.7
 # -*- coding: utf-8 -*-
 import sys
+import traceback
+from flask import abort
 from k8s.Controller import Controller
-from publicClass.PublicFunc import j2_to_file
+from publicClass.PublicFunc import j2_to_file, send_state_back
 
 
 class StatefulSet(Controller):
@@ -20,19 +22,28 @@ class StatefulSet(Controller):
 
     def create_stateful_set_yaml(self, stateful_set_info):
         apply_command_list = []
-        server_type = stateful_set_info['serverType']
-        self.logger.info("开始创建statefulSet.yaml")
-        self.logger.info("statefulSet配置如下：")
-        self.logger.info(stateful_set_info)
-        stateful_set_yaml_j2 = '%s/templates/k8s/statefulSet.yaml.j2' % sys.path[0]
-        stateful_set_yaml = '%s/statefulSet.yaml' % self.k8s_path
-        code = j2_to_file("server", stateful_set_info, stateful_set_yaml_j2, stateful_set_yaml)
-        if code == 1:
-            return code
-        self.logger.info("statefulSet.yaml已生成。")
-        if server_type == "istio":
-            command = "istioctl kube-inject -f %s | kubectl apply -f -" % stateful_set_yaml
+        try:
+            server_type = stateful_set_info['serverType']
+        except(KeyError, NameError):
+            self.logger.error(traceback.format_exc())
+            send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                            "[ERROR]：%s" % traceback.format_exc())
+            abort(404)
         else:
-            command = "kubectl apply -f %s" % stateful_set_yaml
-        apply_command_list.append(command)
-        return apply_command_list
+            self.logger.info("开始创建statefulSet.yaml")
+            self.logger.info("statefulSet配置如下：")
+            self.logger.info(stateful_set_info)
+            stateful_set_yaml_j2 = '%s/templates/k8s/statefulSet.yaml.j2' % sys.path[0]
+            stateful_set_yaml = '%s/statefulSet.yaml' % self.k8s_path
+            if not j2_to_file("server", stateful_set_info, stateful_set_yaml_j2, stateful_set_yaml):
+                self.logger.error("statefulSet.yaml生成失败")
+                send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                                "[ERROR]:statefulSet.yaml生成失败")
+                abort(404)
+            self.logger.info("statefulSet.yaml已生成。")
+            if server_type == "istio":
+                command = "istioctl kube-inject -f %s | kubectl apply -f -" % stateful_set_yaml
+            else:
+                command = "kubectl apply -f %s" % stateful_set_yaml
+            apply_command_list.append(command)
+            return apply_command_list

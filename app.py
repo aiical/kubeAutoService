@@ -28,8 +28,6 @@ th.setLevel('INFO')
 logging.getLogger().addHandler(th)
 
 executor = ThreadPoolExecutor(3)
-# cluster_env = sys.argv[1]
-# file_settings = sys.path[0] + '/conf/settings-%s.yaml' % cluster_env
 file_settings = sys.path[0] + '/conf/settings.yaml'
 setting_conf = read_yaml(file_settings)
 api_server = "https://%s:%s" % (str(setting_conf['apiServer']['host']), str(setting_conf['apiServer']['port']))
@@ -49,10 +47,6 @@ def run_app_task(post_json_data):
     app_task = InitApp(setting_conf, post_json_data)
     app_task.check()
     app_task.deploy()
-    # if check_code == 1:
-    #     return 1
-    # else:
-    #     return app_task.deploy()
 
 
 @app.route('/auto/runSys', methods=["POST"])
@@ -65,7 +59,7 @@ def run_auto_deploy_sys_tasks():
 
 def run_system_task(post_json_data):
     system_task = InitSystem(setting_conf, post_json_data)
-    return system_task.deploy()
+    system_task.deploy()
 
 
 @app.route('/auto/opera', methods=["POST"])
@@ -80,10 +74,6 @@ def opera_app_task(post_json_data):
     app_task = InitApp(setting_conf, post_json_data)
     app_task.check()
     app_task.opera()
-    # if check_code == 1:
-    #     return 1
-    # else:
-    #     return app_task.opera()
 
 
 @app.route('/auto/setAccess', methods=["POST"])
@@ -96,11 +86,8 @@ def run_auto_set_access_strategy():
 
 def set_access_strategy(post_json_data):
     access_strategy = InitPolicy(setting_conf, post_json_data)
-    check_code = access_strategy.check()
-    if check_code == 1:
-        return 1
-    else:
-        return access_strategy.deploy()
+    access_strategy.check()
+    access_strategy.deploy()
 
 
 def run_redis_task(redis_data):

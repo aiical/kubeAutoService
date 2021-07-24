@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 import copy
 import traceback
+from flask import abort
 from publicClass.Logger import Logger
-from publicClass.PublicFunc import compared_version, set_ns_svc
+from publicClass.PublicFunc import compared_version, set_ns_svc, send_state_back
 
 
 class Controller:
@@ -14,20 +15,30 @@ class Controller:
         self.k8s_path = k8s_path
         self.controller_info = {}
         try:
-            self.sys_name = self.global_info['sysName']
-            self.app_name = self.global_info['appName']
-            self.service_name, self.namespace = set_ns_svc(self.sys_name, self.app_name)
-            self.container_info = self.k8s_info['container']
-            self.harbor_ip = settings_conf['harborInfo']['host']
-            self.library_repository = "%s/library" % self.harbor_ip
-            self.file_beat_flag = self.global_info['fileBeatFlag']
-            self.file_beat_version = str(settings_conf['fileBeatDefaults']['version'])
-            self.log_stash_host = settings_conf['fileBeatDefaults']['logStashHost']
-            self.sky_walking_host = str(settings_conf['skyWalkingDefaults']['host'])
-            self.sky_walking_flag = self.global_info['skyWalking']['flag']
-            self.log_kafka_info = settings_conf['fileBeatDefaults']['kafkaInfo']
+            self.task_back_url = self.global_info['taskBackUrl']
+            self.task_flow_id = self.global_info['taskFlowId']
         except(KeyError, NameError):
             self.logger.error(traceback.format_exc())
+            abort(404)
+        else:
+            try:
+                self.sys_name = self.global_info['sysName']
+                self.app_name = self.global_info['appName']
+                self.service_name, self.namespace = set_ns_svc(self.sys_name, self.app_name)
+                self.container_info = self.k8s_info['container']
+                self.harbor_ip = settings_conf['harborInfo']['host']
+                self.library_repository = "%s/library" % self.harbor_ip
+                self.file_beat_flag = self.global_info['fileBeatFlag']
+                self.file_beat_version = str(settings_conf['fileBeatDefaults']['version'])
+                self.log_stash_host = settings_conf['fileBeatDefaults']['logStashHost']
+                self.sky_walking_host = str(settings_conf['skyWalkingDefaults']['host'])
+                self.sky_walking_flag = self.global_info['skyWalking']['flag']
+                self.log_kafka_info = settings_conf['fileBeatDefaults']['kafkaInfo']
+            except(KeyError, NameError):
+                self.logger.error(traceback.format_exc())
+                send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                                "[ERROR]：%s" % traceback.format_exc())
+                abort(404)
 
     def get_controller_share_info(self):
         try:
@@ -64,6 +75,9 @@ class Controller:
                 env_list = []
         except(KeyError, NameError):
             self.logger.error(traceback.format_exc())
+            send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                            "[ERROR]：%s" % traceback.format_exc())
+            abort(404)
         else:
             self.controller_info.update({
                 'fileBeatFlag': self.file_beat_flag,
@@ -94,6 +108,9 @@ class Controller:
             lifecycle = self.container_info['lifecycle']
         except(KeyError, NameError):
             self.logger.error(traceback.format_exc())
+            send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                            "[ERROR]：%s" % traceback.format_exc())
+            abort(404)
         else:
             self.controller_info.update({
                 'startup': startup,
@@ -212,6 +229,9 @@ class Controller:
             })
         except(KeyError, NameError):
             self.logger.error(traceback.format_exc())
+            send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                            "[ERROR]：%s" % traceback.format_exc())
+            abort(404)
 
     def get_if_istio_ip(self):
         try:
@@ -262,13 +282,20 @@ class Controller:
                 })
         except(KeyError, NameError, ValueError):
             self.logger.error(traceback.format_exc())
+            send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                            "[ERROR]：%s" % traceback.format_exc())
+            abort(404)
 
     def get_cron_job_schedule(self):
         try:
             """获取schedule"""
             schedule = self.k8s_info['schedule']
+        except(KeyError, NameError):
+            self.logger.error(traceback.format_exc())
+            send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                            "[ERROR]：%s" % traceback.format_exc())
+            abort(404)
+        else:
             self.controller_info.update({
                 'schedule': schedule,
             })
-        except(KeyError, NameError):
-            self.logger.error(traceback.format_exc())
