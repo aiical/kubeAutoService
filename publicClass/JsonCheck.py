@@ -29,7 +29,10 @@ def exchange_json(para_data, task_back_url, task_flow_id):
     logger = Logger("server")
     try:
         str_sys_name = para_data['global']['sysName']
-        str_app_name = para_data['global']['appName']
+        if para_data['global'].__contains__('appName'):
+            str_app_name = para_data['global']['appName']
+        else:
+            str_app_name = ''
         tmp_sys_name = str_sys_name.lower()
         tmp_app_name = str_app_name.lower()
         """转换runEnv"""
@@ -43,14 +46,14 @@ def exchange_json(para_data, task_back_url, task_flow_id):
             'appName': str(tmp_app_name)
         })
         """转换appContext"""
-        str_app_context = para_data['global']['appContext']
+        if para_data['global'].__contains__('appContext'):
+            str_app_context = para_data['global']['appContext']
+            text_context = str_app_context['appContext']
+            para_data['global'].update({
+                'appContext': text_context
+            })
         # tmp_app_context = eval(str_app_context)
-        tmp_app_context = str_app_context
-
-        text_context = tmp_app_context['appContext']
-        para_data['global'].update({
-            'appContext': text_context
-        })
+        # tmp_app_context = str_app_context
         send_state_back(task_back_url, task_flow_id, 2, 3,
                         "[INFO]：发布json预处理成功")
         return para_data

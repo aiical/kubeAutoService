@@ -108,13 +108,13 @@ class K8sOpera:
                 job_list = job.get_job_info()
                 start_command_list.extend(job.create_job_yaml(job_list))
             elif announce_type == "timed":
-                """生成cronjob.yaml"""
-                self.logger.info("生成k8s资源清单cronjob.yaml")
+                """生成cronJob.yaml"""
+                self.logger.info("生成k8s资源清单cronJob.yaml")
                 cronjob = CronJob(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
                 cronjob_list = cronjob.get_cron_job_info()
                 start_command_list.extend(cronjob.create_cron_job_yaml(cronjob_list))
             elif announce_type == "permanent":
-                """生成serviceaccount.yaml"""
+                """生成serviceAccount.yaml"""
                 self.logger.info("生成k8s资源清单serviceaccount.yaml")
                 service_account = ServiceAccount(self.global_info, self.k8s_info, self.k8s_path)
                 service_account_info = service_account.get_service_account_info()
@@ -154,15 +154,15 @@ class K8sOpera:
                     tmp_command = gateway.create_gateway_yaml(gateway_info)
                     start_command_list.extend(tmp_command)
                     # if controller_type == "deployment":
-                    """生成destinationrule.yaml"""
-                    self.logger.info("生成k8s资源清单destinationrule.yaml")
+                    """生成destinationRule.yaml"""
+                    self.logger.info("生成k8s资源清单destinationRule.yaml")
                     destination_rule = DestinationRule(self.global_info, self.k8s_info, self.k8s_path)
                     destination_rule_info = destination_rule.get_destination_rule_info()
                     tmp_command = destination_rule.create_destination_rule_yaml(destination_rule_info)
                     start_command_list.extend(tmp_command)
 
-                    """生成virtualservice.yaml"""
-                    self.logger.info("生成k8s资源清单virtualservice.yaml")
+                    """生成virtualService.yaml"""
+                    self.logger.info("生成k8s资源清单virtualService.yaml")
                     virtual_service = VirtualService(self.global_info, self.k8s_info, self.k8s_path)
                     virtual_service_info = virtual_service.get_virtual_service_info()
                     tmp_command = virtual_service.create_virtual_service_yaml(virtual_service_info)

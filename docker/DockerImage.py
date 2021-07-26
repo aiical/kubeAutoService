@@ -254,8 +254,8 @@ class DockerImage:
 
     def __get_run(self):
         list_run = []
-        dft_run = "RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' > /etc/timezone"
-        list_run.append(dft_run)
+        # dft_run = "RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' > /etc/timezone"
+        # list_run.append(dft_run)
         try:
             tmp_run = self.docker_info['run']
         except(KeyError, NameError):
@@ -397,14 +397,14 @@ class DockerImage:
                 tomcat_env = [
                     "TOMCAT_HOME %s/%s" % (tomcat_dest, tomcat_dir),
                 ]
-                tmp_tomcat_run = "RUN chmod 777 %s/%s/bin/*.sh" % (tomcat_dest, tomcat_dir)
-                tomcat_run = tmp_tomcat_run.replace("//", "/")
-                tomcat_endpoint = "%s/%s/bin/catalina.sh run" % (tomcat_dest, tomcat_dir)
+                # tmp_tomcat_run = "RUN chmod 777 %s/%s/bin/*.sh" % (tomcat_dest, tomcat_dir)
+                # tomcat_run = tmp_tomcat_run.replace("//", "/")
+                tomcat_endpoint = "sh %s/%s/bin/catalina.sh run" % (tomcat_dest, tomcat_dir)
                 tomcat_endpoint = tomcat_endpoint.replace("//", "/")
                 tomcat_dict.update({
                     'tomcat_add': tomcat_add,
                     'tomcat_copy': tomcat_copy,
-                    'tomcat_run': tomcat_run,
+                    # 'tomcat_run': tomcat_run,
                     'tomcat_env': tomcat_env,
                     'tomcat_endpoint': tomcat_endpoint
                 })
@@ -593,14 +593,14 @@ class DockerImage:
         tomcat_add = []
         tomcat_copy = []
         tomcat_env = []
-        tomcat_run = ""
+        # tomcat_run = ""
         tomcat_endpoint = ""
         tomcat_dict = self.__get_tomcat()
         if tomcat_dict:
             try:
                 tomcat_add = tomcat_dict['tomcat_add']
                 tomcat_copy = tomcat_dict['tomcat_copy']
-                tomcat_run = tomcat_dict['tomcat_run']
+                # tomcat_run = tomcat_dict['tomcat_run']
                 tomcat_env = tomcat_dict['tomcat_env']
                 tomcat_endpoint = tomcat_dict['tomcat_endpoint']
             except(KeyError, NameError):
@@ -649,8 +649,8 @@ class DockerImage:
         default_run_list = self.__get_run()
         if default_run_list:
             list_run.extend(default_run_list)
-        if tomcat_run:
-            list_run.append(tomcat_run)
+        # if tomcat_run:
+        #     list_run.append(tomcat_run)
 
         """EXPOSE"""
         str_expose = self.__get_expose()

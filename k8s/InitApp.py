@@ -30,7 +30,6 @@ class InitApp(InitProject):
             send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
                             "[ERROR]：%s" % traceback.format_exc())
             abort(404)
-            # return 1
         else:
             if mode == "new":
                 mode_info = "全新发布"
@@ -54,7 +53,6 @@ class InitApp(InitProject):
 
             """获取镜像标签"""
             self.logger.info("创建应用镜像全名")
-            # current_task_step += 1
 
             str_image_final = DockerImage.create_full_image_name(image_info)
 

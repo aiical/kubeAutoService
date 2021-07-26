@@ -11,7 +11,6 @@ from publicClass.Logger import Logger
 from publicClass.PublicFunc import read_yaml
 from k8s.InitSystem import InitSystem
 from k8s.InitApp import InitApp
-from k8s.AuthorizationPolicy import AuthorizationPolicy
 from k8s.InitPolicy import InitPolicy
 from k8s.CheckOpera import CheckOpera
 
@@ -59,6 +58,7 @@ def run_auto_deploy_sys_tasks():
 
 def run_system_task(post_json_data):
     system_task = InitSystem(setting_conf, post_json_data)
+    system_task.check()
     system_task.deploy()
 
 

@@ -2,18 +2,19 @@
 FROM {{ baseFrom }}
 {# MAINTAINER #}
 MAINTAINER {{ maintainer }}
+{# RUN mkdir #}
+{% if mkdirList != [] %}
+{% for mkdir in mkdirList %}
+{{ mkdir }}
+{% endfor %}
+{% endif %}
+
 {# WORKDIR #}
 WORKDIR {{ workdir }}
 {# ENV #}
 {% if envList is not none %}
 {% for env in envList %}
 ENV {{ env }}
-{% endfor %}
-{% endif %}
-{# RUN mkdir #}
-{% if mkdirList != [] %}
-{% for mkdir in mkdirList %}
-{{ mkdir }}
 {% endfor %}
 {% endif %}
 {# ADD #}
@@ -28,6 +29,7 @@ ADD {{ add }}
 COPY {{ copy }}
 {% endfor %}
 {% endif %}
+
 {# RUN #}
 {% if runList != [] %}
 {% for run in runList %}
@@ -38,6 +40,13 @@ COPY {{ copy }}
 {% if expose %}
 EXPOSE {{ expose }}
 {% endif %}
+{# USER #}
+{#RUN groupadd -g 2002 container#}
+{#RUN useradd -u 2002 -g container -d /home container#}
+{#RUN chown -R container:container /home#}
+{#RUN chmod -R 777 /home#}
+{#USER container#}
+
 {# ENTRYPOINT #}
 {% if entrypoint %}
 ENTRYPOINT {{ entrypoint }}
