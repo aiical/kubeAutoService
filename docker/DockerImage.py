@@ -375,8 +375,9 @@ class DockerImage:
             tomcat_dict = {}
             if tomcat_flag == "Y":
                 tomcat_name = tmp_tomcat['name']
-                tomcat_dir = tomcat_name.replace(".tar.gz", "")
-                tomcat_dest = tmp_tomcat['dest']
+                # tomcat_dir = tomcat_name.replace(".tar.gz", "")
+                tomcat_dir = tmp_tomcat['dest']
+                tomcat_dest = self.docker_info['workdir']
                 tomcat_file = tmp_tomcat['file']
                 tomcat_copy = []
                 tomcat_add = []
@@ -396,6 +397,7 @@ class DockerImage:
                             tomcat_copy.append(copy_info)
                 tomcat_env = [
                     "TOMCAT_HOME %s/%s" % (tomcat_dest, tomcat_dir),
+                    "CATALINA_OUT /logs"
                 ]
                 # tmp_tomcat_run = "RUN chmod 777 %s/%s/bin/*.sh" % (tomcat_dest, tomcat_dir)
                 # tomcat_run = tmp_tomcat_run.replace("//", "/")
@@ -423,9 +425,9 @@ class DockerImage:
             jdk_dict = {}
             if jdk_flag == "Y":
                 jdk_name = tmp_jdk['name']
-                jdk_dir = jdk_name.replace(".tar.gz", "")
-
-                jdk_dest = tmp_jdk['dest']
+                # jdk_dir = jdk_name.replace(".tar.gz", "")
+                jdk_dir = tmp_jdk['dest']
+                jdk_dest = self.docker_info['workdir']
                 jdk_file = tmp_jdk['file']
                 jdk_copy = []
                 jdk_add = []
@@ -669,6 +671,10 @@ class DockerImage:
             str_entry_point = tomcat_endpoint
         else:
             str_entry_point = other_entry_point
+
+        if str_entry_point != "":
+            str_entry_point = "tini -- %s" % str_entry_point
+
         if str_entry_point == "" and if_nginx != "nginx":
             self.logger.error("未填写ENTRYPOINT")
             send_state_back(self.task_back_url, self.task_flow_id, 5, 5,

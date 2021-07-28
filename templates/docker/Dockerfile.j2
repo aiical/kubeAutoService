@@ -40,12 +40,6 @@ COPY {{ copy }}
 {% if expose %}
 EXPOSE {{ expose }}
 {% endif %}
-{# USER #}
-{#RUN groupadd -g 2002 container#}
-{#RUN useradd -u 2002 -g container -d /home container#}
-{#RUN chown -R container:container /home#}
-{#RUN chmod -R 777 /home#}
-{#USER container#}
 
 {# ENTRYPOINT #}
 {% if entrypoint %}
