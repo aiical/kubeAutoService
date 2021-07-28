@@ -397,7 +397,7 @@ class DockerImage:
                             tomcat_copy.append(copy_info)
                 tomcat_env = [
                     "TOMCAT_HOME %s/%s" % (tomcat_dest, tomcat_dir),
-                    "CATALINA_OUT /logs"
+                    "CATALINA_OUT /logs/catalina.out"
                 ]
                 # tmp_tomcat_run = "RUN chmod 777 %s/%s/bin/*.sh" % (tomcat_dest, tomcat_dir)
                 # tomcat_run = tmp_tomcat_run.replace("//", "/")
