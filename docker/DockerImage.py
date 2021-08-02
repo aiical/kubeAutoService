@@ -389,14 +389,16 @@ class DockerImage:
                         file_dest = file['dest']
                         if is_compress(file_name):
                             add_info = "%s %s/%s/%s" % (file_name, tomcat_dest, tomcat_dir, file_dest)
-                            add_info.replace("//", "/")
+                            add_info = add_info.replace("//", "/")
                             tomcat_add.append(add_info)
                         else:
                             copy_info = "%s %s/%s/%s" % (file_name, tomcat_dest, tomcat_dir, file_dest)
-                            copy_info.replace("//", "/")
+                            copy_info = copy_info.replace("//", "/")
                             tomcat_copy.append(copy_info)
+                tomcat_home = "%s/%s" % (tomcat_dest, tomcat_dir)
+                tomcat_home = tomcat_home.replace("//", "/").replace("//", "/")
                 tomcat_env = [
-                    "TOMCAT_HOME %s/%s" % (tomcat_dest, tomcat_dir),
+                    "TOMCAT_HOME %s" % tomcat_home,
                     "CATALINA_OUT /logs/catalina.out"
                 ]
                 # tmp_tomcat_run = "RUN chmod 777 %s/%s/bin/*.sh" % (tomcat_dest, tomcat_dir)
@@ -439,11 +441,11 @@ class DockerImage:
                         file_dest = file['dest']
                         if is_compress(file_name):
                             add_info = "%s %s/%s/%s" % (file_name, jdk_dest, jdk_dir, file_dest)
-                            add_info.replace("//", "/")
+                            add_info = add_info.replace("//", "/")
                             jdk_add.append(add_info)
                         else:
                             copy_info = "%s %s/%s/%s" % (file_name, jdk_dest, jdk_dir, file_dest)
-                            copy_info.replace("//", "/")
+                            copy_info = copy_info.replace("//", "/")
                             jdk_copy.append(copy_info)
 
                 tmp_java_home = jdk_dest + "/" + jdk_dir

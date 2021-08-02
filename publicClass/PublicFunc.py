@@ -28,7 +28,7 @@ def read_yaml(file_path):
 
 def shell_cmd(log_type, str_cmd):
     logger = Logger(log_type)
-    str_cmd.replace("//", "/")
+    str_cmd = str_cmd.replace("//", "/")
     cmd = subprocess.Popen(str_cmd,
                            shell=True,
                            stdout=subprocess.PIPE,
@@ -48,7 +48,7 @@ def shell_cmd(log_type, str_cmd):
 
 def ssh_shell_cmd(log_type, host, str_cmd):
     logger = Logger(log_type)
-    str_cmd.replace("//", "/")
+    str_cmd = str_cmd.replace("//", "/")
     private = paramiko.RSAKey.from_private_key_file('/root/.ssh/id_rsa')
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())

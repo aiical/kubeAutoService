@@ -65,8 +65,30 @@ class InitApp(InitProject):
                 'imageFullName': str_image_final
             })
 
+            global_config.update({
+                'skyWalkingHome': ""
+            })
+
             """docker部署部分"""
             if docker_type == "new":
+                try:
+                    sky_walking_flag = global_config['skyWalking']['flag']
+                    sky_walking_dir = global_config['skyWalking']['dest']
+                    work_dir = docker_config['newImage']['workdir']
+                except(KeyError, NameError):
+                    self.logger.error(traceback.format_exc())
+                    send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                                    "[ERROR]：%s" % traceback.format_exc())
+                    abort(404)
+                else:
+                    if sky_walking_flag == "Y":
+                        sky_walking_home = "%s/%s" % (work_dir, sky_walking_dir)
+                        sky_walking_home = sky_walking_home.replace("//", "/")
+
+                        global_config.update({
+                            'skyWalkingHome': sky_walking_home
+                        })
+
                 self.logger.info("全新制作镜像部分:")
                 volume_mount_dir = []
                 if k8s_announce_type != "none":

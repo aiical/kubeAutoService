@@ -33,6 +33,10 @@ class Controller:
                 self.log_stash_host = settings_conf['fileBeatDefaults']['logStashHost']
                 self.sky_walking_host = str(settings_conf['skyWalkingDefaults']['host'])
                 self.sky_walking_flag = self.global_info['skyWalking']['flag']
+                if self.sky_walking_flag == "Y":
+                    self.sky_walking_home = self.global_info['skyWalkingHome']
+                else:
+                    self.sky_walking_home = ""
                 self.log_kafka_info = settings_conf['fileBeatDefaults']['kafkaInfo']
             except(KeyError, NameError):
                 self.logger.error(traceback.format_exc())
@@ -83,6 +87,7 @@ class Controller:
                 'fileBeatFlag': self.file_beat_flag,
                 'fileBeatVersion': self.file_beat_version,
                 'skyWalkingFlag': self.sky_walking_flag,
+                'skyWalkingHome': self.sky_walking_home,
                 'serviceName': self.service_name,
                 'namespace': self.namespace,
                 'imageFullName': image_full_name,

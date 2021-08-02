@@ -58,7 +58,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: AGENT_OPTS
-              value: -javaagent:/home/agent/skywalking-agent.jar=agent.service_name={{ serviceName }}-cronjob,agent.instance_name=$(POD_NAME)
+              value: -javaagent:{{ skyWalkingHome }}/skywalking-agent.jar=agent.service_name={{ serviceName }}-cronjob,agent.instance_name=$(POD_NAME)
             {% endif %}
             {# volumeMounts #}
             {% if fileBeatFlag == "Y" or volumeInfo.volumeCount > 0 %}

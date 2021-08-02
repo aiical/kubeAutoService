@@ -77,7 +77,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: AGENT_OPTS
-          value: -javaagent:/home/agent/skywalking-agent.jar=agent.service_name={{ serviceName }},agent.instance_name=$(POD_NAME)
+          value: -javaagent:{{ skyWalkingHome }}/skywalking-agent.jar=agent.service_name={{ serviceName }},agent.instance_name=$(POD_NAME)
         {% endif %}
         {% endif %}
         {# startupProbe #}
