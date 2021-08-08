@@ -6,6 +6,7 @@ import time
 import traceback
 from flask import abort
 from k8s.InitProject import InitProject
+from k8s.AuthorizationPolicy import AuthorizationPolicy
 from publicClass.PublicFunc import j2_to_file, shell_cmd, send_state_back
 
 
@@ -183,7 +184,8 @@ class InitSystem(InitProject):
 
     def deploy(self):
         try:
-            mode = self.para_config['global']['mode']
+            global_info = self.para_config['global']
+            mode = global_info['mode']
         except(KeyError, NameError):
             self.logger.error(traceback.format_exc())
             send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
@@ -199,6 +201,7 @@ class InitSystem(InitProject):
             self.logger.info("本次发布模式：【%s】" % mode_info)
             self.logger.info("本次发布类别：run sys")
             # system_task = InitSystem(setting_conf, post_json_data)
+            self.create_sys_path()
             """创建namespace"""
             namespace_info = self.get_namespace_info()
             self.create_namespace_yaml(namespace_info)
@@ -210,6 +213,20 @@ class InitSystem(InitProject):
             """若有需要，创建该名称空间下的nfs-provider"""
             nfs_provider_info = self.get_nfs_provider_info()
             self.create_nfs_provider_yaml(nfs_provider_info)
+
+            policy_info = self.para_config['policy']
+            ap = AuthorizationPolicy(self.settings_conf, global_info, policy_info, self.sys_path)
+            ap_policy_list = ap.get_ap_ns_to_ns_info()
+            if ap_policy_list:
+                for ap_policy in ap_policy_list:
+                    apply_command_list = ap.create_ns_to_ns_yaml(ap_policy)
+                    for apply_command in apply_command_list:
+                        if not shell_cmd("server", apply_command):
+                            send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                                            "[ERROR]:COMMAND:%s执行出错" % apply_command)
+                            abort(404)
+                        send_state_back(self.task_back_url, self.task_flow_id, 2, 3,
+                                        "[INFO]：创建nfs-provider成功")
 
             time.sleep(2)
             self.logger.info("本次系统发布完成...")

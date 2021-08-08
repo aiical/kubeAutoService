@@ -1,0 +1,13 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ toNamespace }}-from-{{ fromNamespace }}-policy
+  namespace: {{ toNamespace }}
+spec:
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        namespaces:
+        - {{ fromNamespace }}

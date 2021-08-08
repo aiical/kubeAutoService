@@ -52,11 +52,9 @@ traffic:
     nodePort: 31384,
     nginxPort: 8097
 
-istioAuthorizationPolicy:
-  allowFrom:
+policy:
+  to:
     namespace:
     - kafka-system
     - flink-system
     - young-system
-    ip:
-    - 10.3.143.61

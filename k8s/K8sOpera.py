@@ -170,10 +170,15 @@ class K8sOpera:
 
                     """生成authorizationPolicy.yaml"""
                     self.logger.info("生成k8s资源清单authorizationPolicy.yaml")
-                    policy = AuthorizationPolicy(self.setting_conf, self.global_info, self.k8s_path)
-                    policy_info = policy.get_ap_ns_to_svc_info()
-                    tmp_command = policy.create_ns_to_svc_yaml(policy_info)
-                    start_command_list.extend(tmp_command)
+                    policy = AuthorizationPolicy(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
+                    dft_ns_policy_info = policy.get_ap_ns_to_svc_info()
+                    tmp_dft_ns_command = policy.create_ns_to_svc_yaml(dft_ns_policy_info)
+                    start_command_list.extend(tmp_dft_ns_command)
+                    svc_policy_info_list = policy.get_ap_svc_to_svc_info()
+                    if svc_policy_info_list:
+                        for svc_policy_info in svc_policy_info_list:
+                            tmp_svc_command = policy.create_svc_to_svc_yaml(svc_policy_info)
+                            start_command_list.extend(tmp_svc_command)
 
                 self.logger.info("启动服务命令列表如下")
                 self.logger.info(start_command_list)

@@ -370,6 +370,9 @@ kubernetes:
       whiteIpList:
         - 172.30.240.17
         - 172.30.240.10
+      accessService:
+        - namespace:
+          service:
       # 选填
       # istio流量转发规则
       destinationRule:
