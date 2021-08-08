@@ -225,8 +225,8 @@ class InitSystem(InitProject):
                             send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
                                             "[ERROR]:COMMAND:%s执行出错" % apply_command)
                             abort(404)
-                        send_state_back(self.task_back_url, self.task_flow_id, 2, 3,
-                                        "[INFO]：创建nfs-provider成功")
+                send_state_back(self.task_back_url, self.task_flow_id, 2, 3,
+                                "[INFO]：创建名称空间访问权限成功")
 
             time.sleep(2)
             self.logger.info("本次系统发布完成...")
