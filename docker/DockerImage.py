@@ -399,7 +399,8 @@ class DockerImage:
                 tomcat_home = tomcat_home.replace("//", "/").replace("//", "/")
                 tomcat_env = [
                     "TOMCAT_HOME %s" % tomcat_home,
-                    "CATALINA_OUT /logs/catalina.out"
+                    # "CATALINA_OUT /logs/catalina.out",
+                    # "CATALINA_OUT_CMD /usr/bin/rotatelogs -f /logs/catalina.out.%Y-%m-%d.log 86400"
                 ]
                 # tmp_tomcat_run = "RUN chmod 777 %s/%s/bin/*.sh" % (tomcat_dest, tomcat_dir)
                 # tomcat_run = tmp_tomcat_run.replace("//", "/")

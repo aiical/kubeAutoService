@@ -1,5 +1,6 @@
 #!/usr/local/python374/bin/python3.7
 # -*- coding: utf-8 -*-
+import os
 import copy
 import traceback
 from flask import abort
@@ -210,9 +211,16 @@ class Controller:
                         v_name = "%s-%s" % (self.service_name, v_dir)
                         v_nfs_server = item['server']
                         v_nfs_base_path = item['path']
+                        v_node_mount_path = item['nodePath']
                         v_is_file_share = item['isFileShare']
-                        v_nfs_final_path = "%s/%s/%s/%s" % (v_nfs_base_path, self.sys_name, self.service_name, v_dir)
+                        v_nfs_final_path = "%s/%s/%s/%s" % (
+                            v_nfs_base_path, self.sys_name, self.service_name, v_dir)
+                        v_node_need_mkdir_path = "%s/%s/%s/%s" % (
+                            v_node_mount_path, self.sys_name, self.service_name, v_dir)
                         v_nfs_final_path = v_nfs_final_path.replace("//", "/")
+                        v_node_need_mkdir_path = v_node_need_mkdir_path.replace("//", "/")
+                        if not os.path.exists(v_node_need_mkdir_path):
+                            os.makedirs(v_node_need_mkdir_path)
                         nfs_list.append({
                             'name': v_name,
                             'mountPath': v_mount,
