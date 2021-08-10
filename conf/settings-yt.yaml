@@ -51,4 +51,4 @@ objectStorage:
   serverUrl: "http://10.1.1.198:8800/downloadfile"
   clientIp: 10.3.132.53
 taskInfoBack:
-  url: "http://10.3.137.14:8888/datab/config/callback"
+  url: "http://10.3.143.64:8889/datab/config/callback"

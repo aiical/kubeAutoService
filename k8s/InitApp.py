@@ -215,7 +215,7 @@ class InitApp(InitProject):
                     abort(404)
                     # return 1
 
-                matchers = ['deployment', 'statefulset', 'job', 'cronjob']
+                matchers = ['deployment', 'statefulSet', 'job', 'cronJob']
                 matching = [s for s in k8s_current_yaml_file if any(xs in s for xs in matchers)]
                 for yaml_file in matching:
                     cmd_line = "kubectl delete -f %s" % yaml_file

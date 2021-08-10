@@ -198,3 +198,14 @@ def send_state_back(task_back_url, task_flow_id, task_state, step_state, step_in
         'stepInfo': step_info
     }
     asyncio.run(http_post(task_back_url, step_info))
+
+
+def file_replace(file, old_str, new_str):
+    file_data = ""
+    with open(file, "r", encoding="utf-8") as f:
+        for line in f:
+            if old_str in line:
+                line = line.replace(old_str, new_str)
+                file_data += line
+    with open(file, "w", encoding="utf-8") as f:
+        f.write(file_data)

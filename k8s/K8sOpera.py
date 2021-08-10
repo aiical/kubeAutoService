@@ -5,7 +5,7 @@ import os
 import traceback
 from flask import abort
 from publicClass.Logger import Logger
-from publicClass.PublicFunc import shell_cmd, set_ns_svc, get_files, send_state_back
+from publicClass.PublicFunc import shell_cmd, set_ns_svc, get_files, send_state_back, file_replace
 from k8s.Service import Service
 from k8s.ServiceAccount import ServiceAccount
 from k8s.Deployment import Deployment
@@ -70,6 +70,11 @@ class K8sOpera:
                         send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
                                         "[ERROR]:COMMAND:%s执行出错" % str_cmd)
                         abort(404)
+
+                    start_file = "%s/appStart.sh" % self.k8s_bak_path
+                    file_replace(start_file, self.k8s_path, self.k8s_bak_path)
+                    logger.info("修改备份目录下%s中文件目录从%s到%s" % (start_file, self.k8s_path, self.k8s_bak_path))
+
                 os.makedirs(self.k8s_path)
 
                 """介质源路径"""

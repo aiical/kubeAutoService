@@ -52,4 +52,4 @@ objectStorage:
   clientIp: 10.3.132.53
 taskInfoBack:
   # url: "http://172.30.240.6:20009/state"
-  url: "http://172.30.240.17:8888/datab/config/callback"
+  url: "http://10.3.143.64:8889/datab/config/callback"
