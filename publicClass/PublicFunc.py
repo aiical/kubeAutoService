@@ -191,13 +191,16 @@ def compared_version(ver1, ver2):
 
 
 def send_state_back(task_back_url, task_flow_id, task_state, step_state, step_info):
+    logger = Logger("server")
     step_info = {
         'taskFlowId': task_flow_id,
         'taskState': str(task_state),
         'stepState': str(step_state),
         'stepInfo': step_info
     }
-    asyncio.run(http_post(task_back_url, step_info))
+    logger.info(step_info)
+    resp_status = asyncio.run(http_post(task_back_url, step_info))
+    logger.info("状态码为%s" % resp_status)
 
 
 def file_replace(file, old_str, new_str):
