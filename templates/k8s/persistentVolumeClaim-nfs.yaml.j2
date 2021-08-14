@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nfs-{{ name }}
+  namespace: {{ namespace }}
+  labels: # 这些labels可以不定义
+    name: pvc-nfs-{{ name }}
+    type: nfs
+spec:
+  accessModes:
+  - ReadWriteMany
+  - ReadWriteOnce
+  - ReadOnlyMany
+  resources:
+    requests:
+      storage: {{ size }}
