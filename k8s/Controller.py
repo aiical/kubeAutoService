@@ -1,9 +1,9 @@
 #!/usr/local/python374/bin/python3.7
 # -*- coding: utf-8 -*-
-import os
 import copy
 import traceback
 from flask import abort
+from k8s.PersistentVolumeClaim import PersistentVolumeClaim
 from publicClass.Logger import Logger
 from publicClass.PublicFunc import compared_version, set_ns_svc, send_state_back
 
@@ -47,6 +47,8 @@ class Controller:
 
     def get_controller_share_info(self):
         try:
+            announce_type = self.k8s_info['announceType']
+            controller_type = self.k8s_info['controllerType']
             """获取tag"""
             image_full_name = self.global_info['imageFullName']
             """获取replicas"""
@@ -93,6 +95,8 @@ class Controller:
                 'namespace': self.namespace,
                 'imageFullName': image_full_name,
                 'replicas': replicas,
+                'controllerType': controller_type,
+                'announceType': announce_type,
                 'nodeSelectorList': new_node_select_list,
                 'hostInfo': host_info,
                 'libraryRepository': self.library_repository,
@@ -128,82 +132,89 @@ class Controller:
     def get_volume_info(self):
         try:
             """获取volume信息"""
-            volume_dir_info_list = []
+            volume_dir_nfs_info_list = []
+            volume_dir_local_info_list = []
             volume_file_info_list = []
-
-            volume_list = self.container_info['volume']
-            if volume_list:
-                for volume in volume_list:
-                    volume_type = volume['type']
-                    if volume_type == "hostPath":
-                        v_mount = volume['mountPath']
-                        v_size = volume['pvcSize']
-                        v_dir = v_mount.split('/')[-1].lower()
-                        v_name = "%s-%s" % (self.service_name, v_dir)
-                        v_local = volume['localPath']
-                        volume_dir_info_list.append(copy.deepcopy(
-                            {
-                                'type': volume_type,
-                                'name': v_name,
-                                'size': v_size,
-                                'mountPath': v_mount,
-                                'localPath': v_local
-                            }
-                        ))
-                    elif volume_type == "configMap":
-                        v_mount = volume['mountPath']
-                        v_file = volume['fileName']
-                        tmp_name = ''.join(list(filter(str.isalnum, v_file))).lower()
-                        v_name = "%s-%s" % (self.service_name, tmp_name)
-                        v_key = volume['key']
-                        v_md5_code = volume['md5Code']
-                        volume_file_info_list.append(copy.deepcopy(
-                            {
-                                'type': volume_type,
-                                'name': v_name,
-                                'mountPath': v_mount,
-                                'file': v_file,
-                                'key': v_key,
-                                'md5Code': v_md5_code
-                            }
-                        ))
-                    elif volume_type == "nfs":
-                        v_mount = volume['mountPath']
-                        v_dir = v_mount.split('/')[-1].lower()
-                        v_name = "%s-%s" % (self.service_name, v_dir)
-                        v_nfs_server = volume['server']
-                        v_nfs_base_path = volume['path']
-                        v_size = volume['pvcSize']
-                        v_local_mount_path = volume['nodePath']
-                        v_is_file_share = volume['isFileShare']
-                        v_is_nfs_share = volume['isNfsShare']
-                        if v_is_nfs_share == "Y":
-                            v_nfs_final_path = "%s/%s/%s/%s" % (
-                                v_nfs_base_path, self.sys_name, self.service_name, v_dir)
-                            v_node_need_mkdir_path = "%s/%s/%s/%s" % (
-                                v_local_mount_path, self.sys_name, self.service_name, v_dir)
-                            v_node_need_mkdir_path = v_node_need_mkdir_path.replace("//", "/")
-                            if not os.path.exists(v_node_need_mkdir_path):
-                                os.makedirs(v_node_need_mkdir_path)
-                        else:
-                            v_nfs_final_path = v_nfs_base_path
-                        v_nfs_final_path = v_nfs_final_path.replace("//", "/")
-                        volume_dir_info_list.append(copy.deepcopy(
-                            {
-                                'type': volume_type,
-                                'name': v_name,
-                                'size': v_size,
-                                'mountPath': v_mount,
-                                'server': v_nfs_server,
-                                'path': v_nfs_final_path,
-                                'isFileShare': v_is_file_share
-                            }
-                        ))
+            local_volume_list = self.container_info['volume']['hostPath']
+            nfs_volume_list = self.container_info['volume']['nfs']
+            config_volume_list = self.container_info['volume']['configMap']
+            if local_volume_list:
+                for volume in local_volume_list:
+                    v_mount = volume['mountPath']
+                    if v_mount[-1] == "/":
+                        v_mount = v_mount[:-1]
+                    v_size = volume['pvcSize']
+                    v_dir = v_mount[1:].replace("/", "-").replace("_", "-").lower()
+                    v_name = "%s-%s" % (self.service_name, v_dir)
+                    v_local = volume['localPath']
+                    volume_dir_local_info_list.append(copy.deepcopy(
+                        {
+                            'name': v_name,
+                            'size': v_size,
+                            'mountPath': v_mount,
+                            'localPath': v_local
+                        }
+                    ))
+            if config_volume_list:
+                for volume in config_volume_list:
+                    v_mount = volume['mountPath']
+                    v_file = volume['fileName']
+                    tmp_name = ''.join(list(filter(str.isalnum, v_file))).lower()
+                    v_name = "%s-%s" % (self.service_name, tmp_name)
+                    v_key = volume['key']
+                    v_md5_code = volume['md5Code']
+                    volume_file_info_list.append(copy.deepcopy(
+                        {
+                            'name': v_name,
+                            'mountPath': v_mount,
+                            'file': v_file,
+                            'key': v_key,
+                            'md5Code': v_md5_code
+                        }
+                    ))
+            if nfs_volume_list:
+                for volume in nfs_volume_list:
+                    v_mount = volume['mountPath']
+                    if v_mount[-1] == "/":
+                        v_mount = v_mount[:-1]
+                    v_dir = v_mount[1:].replace("/", "-").replace("_", "-").lower()
+                    v_name = "%s-%s" % (self.service_name, v_dir)
+                    v_nfs_server = volume['server']
+                    v_nfs_base_path = volume['path']
+                    v_size = volume['pvcSize']
+                    v_local_mount_path = volume['nodePath']
+                    v_is_file_share = volume['isFileShare']
+                    v_is_nfs_share = volume['isNfsShare']
+                    if v_is_nfs_share == "Y":
+                        v_nfs_final_path = "%s/%s/%s/%s" % (
+                            v_nfs_base_path, self.sys_name, self.service_name, v_dir)
+                        v_local_need_mkdir_path = "%s/%s/%s/%s" % (
+                            v_local_mount_path, self.sys_name, self.service_name, v_dir)
+                        v_local_need_mkdir_path = v_local_need_mkdir_path.replace("//", "/")
+                        # if not os.path.exists(v_local_need_mkdir_path):
+                        #     os.makedirs(v_local_need_mkdir_path)
                     else:
-                        self.logger.warn("程序暂时不支持该种volume类型【%s】，跳过不处理" % volume_type)
+                        v_local_need_mkdir_path = ""
+                        v_nfs_final_path = v_nfs_base_path
+                    v_nfs_final_path = v_nfs_final_path.replace("//", "/")
+                    volume_dir_nfs_info_list.append(copy.deepcopy(
+                        {
+                            'name': v_name,
+                            'serviceName': self.service_name,
+                            'namespace': self.namespace,
+                            'size': v_size,
+                            'mountPath': v_mount,
+                            'server': v_nfs_server,
+                            'path': v_nfs_final_path,
+                            'isFileShare': v_is_file_share,
+                            'isNfsShare': v_is_nfs_share,
+                            'localMkdir': v_local_need_mkdir_path
+                        }
+                    ))
 
             self.controller_info.update({
-                'volumeInfoList': volume_dir_info_list,
+                'volumeLocalInfoList': volume_dir_local_info_list,
+                'volumeNfsInfoList': volume_dir_nfs_info_list,
                 'configMapList': volume_file_info_list
             })
         except(KeyError, NameError):
@@ -278,3 +289,12 @@ class Controller:
             self.controller_info.update({
                 'schedule': schedule,
             })
+
+    def create_pvc_yaml(self):
+        apply_command_list = []
+        pvc = PersistentVolumeClaim(self.global_info, self.controller_info, self.k8s_path)
+        pvc_info_list = pvc.get_persistent_volume_claim_info()
+        for pvc_info in pvc_info_list:
+            tmp_command_list = pvc.create_persistent_volume_claim_yaml(pvc_info)
+            apply_command_list.extend(tmp_command_list)
+        return apply_command_list

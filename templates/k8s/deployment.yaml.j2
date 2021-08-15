@@ -184,16 +184,23 @@ spec:
             memory: {{ memory.request }}
             ephemeral-storage: {{ ephemeralStorage.request }}
         {# volumeMounts #}
-        {% if fileBeatFlag == "Y" or volumeInfoList | length > 0 or configMapList | length > 0 %}
+        {% if fileBeatFlag == "Y" or volumeLocalInfoList | length > 0 or volumeNfsInfoList | length > 0 or configMapList | length > 0 %}
         volumeMounts:
         {# filebeat配置volumeMounts #}
         {% if fileBeatFlag == "Y" %}
         - name: app-logs
           mountPath: /logs
         {% endif %}
-        {% if volumeInfoList | length > 0 %}
-        {% for volume in volumeInfoList %}
-        {# hostPath和nfs配置volumeMounts #}
+        {% if volumeLocalInfoList | length > 0 %}
+        {% for volume in volumeLocalInfoList %}
+        {# hostPath配置volumeMounts #}
+        - name: {{ volume.name }}
+          mountPath: {{ volume.mountPath }}
+        {% endfor %}
+        {% endif %}
+        {% if volumeNfsInfoList | length > 0 %}
+        {% for volume in volumeNfsInfoList %}
+        {# nfs配置volumeMounts #}
         - name: {{ volume.name }}
           mountPath: {{ volume.mountPath }}
         {% endfor %}
@@ -229,7 +236,7 @@ spec:
           subPath: filebeat.yml
       {% endif %}
       {# volumes #}
-      {% if fileBeatFlag == "Y" or volumeInfoList | length > 0 or configMapList | length > 0 %}
+      {% if fileBeatFlag == "Y" or volumeLocalInfoList | length > 0 or volumeNfsInfoList | length > 0  or configMapList | length > 0 %}
       volumes:
       {# filebeat配置volumes #}
       {% if fileBeatFlag == "Y" %}
@@ -242,17 +249,18 @@ spec:
         configMap:
           name: {{ serviceName }}-fb-conf
       {% endif %}
-      {% if volumeInfoList | length > 0 %}
-      {% for volume in volumeInfoList %}
-      {% if volume.type == "hostPath" %}
+      {% if volumeLocalInfoList | length > 0 %}
+      {% for volume in volumeLocalInfoList %}
       - name: {{ volume.name }}
-        persistentVolumeClaim:
-          claimName: pvc-host-path-{{ volume.name }}
-      {% elif volume.type == "nfs" %}
-      - name: {{ volume.name }}
-        persistentVolumeClaim:
-          claimName: pvc-nfs-{{ volume.name }}
+        hostPath:
+          path: {{ volume.localPath}}
+      {% endfor %}
       {% endif %}
+      {% if volumeNfsInfoList | length > 0 %}
+      {% for volume in volumeNfsInfoList %}
+      - name: {{ volume.name }}
+        persistentVolumeClaim:
+          claimName: pvc-{{ volume.name }}
       {% endfor %}
       {% endif %}
       {% if configMapList | length > 0 %}

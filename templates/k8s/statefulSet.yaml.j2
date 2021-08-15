@@ -168,16 +168,23 @@ spec:
             memory: {{ memory.request }}
             ephemeral-storage: {{ ephemeralStorage.request }}
         {# volumeMounts #}
-        {% if fileBeatFlag == "Y" or volumeInfoList | length > 0 or configMapList | length > 0 %}
+        {% if fileBeatFlag == "Y" or volumeLocalInfoList | length > 0 or volumeNfsInfoList | length > 0 or configMapList | length > 0 %}
         volumeMounts:
         {# filebeat配置volumeMounts #}
         {% if fileBeatFlag == "Y" %}
         - name: app-logs
           mountPath: /logs
         {% endif %}
-        {% if volumeInfoList | length > 0 %}
-        {% for volume in volumeInfoList %}
-        {# hostPath和nfs配置volumeMounts #}
+        {% if volumeLocalInfoList | length > 0 %}
+        {% for volume in volumeLocalInfoList %}
+        {# hostPath配置volumeMounts #}
+        - name: {{ volume.name }}
+          mountPath: {{ volume.mountPath }}
+        {% endfor %}
+        {% endif %}
+        {% if volumeNfsInfoList | length > 0 %}
+        {% for volume in volumeNfsInfoList %}
+        {# nfs配置volumeMounts #}
         - name: {{ volume.name }}
           mountPath: {{ volume.mountPath }}
         {% endfor %}
@@ -206,7 +213,7 @@ spec:
           subPath: filebeat.yml
       {% endif %}
       {# volumes #}
-      {% if fileBeatFlag == "Y" or configMapList | length > 0 %}
+      {% if fileBeatFlag == "Y" or configMapList | length > 0 or volumeLocalInfoList | length > 0 %}
       volumes:
       {# filebeat配置volumes #}
       {% if fileBeatFlag == "Y" %}
@@ -219,6 +226,13 @@ spec:
         configMap:
           name: {{ serviceName }}-fb-conf
       {% endif %}
+      {% if volumeLocalInfoList | length > 0 %}
+      {% for volume in volumeLocalInfoList %}
+      - name: {{ volume.name }}
+        hostPath:
+          path: {{ volume.localPath }}
+      {% endfor %}
+      {% endif %}
       {% if configMapList | length > 0 %}
       {% for configMap in configMapList %}
       - name: {{ configMap.name }}
@@ -228,24 +242,16 @@ spec:
       {% endif %}
       {% endif %}
   {# pvc配置volumeClaimTemplates #}
-  {% if volumeInfoList | length > 0 %}
+  {% if volumeNfsInfoList | length > 0 %}
   volumeClaimTemplates:
-  {% for volume in volumeInfoList %}
+  {% for volume in volumeNfsInfoList %}
   - metadata:
       name: {{ volume.name }}
     spec:
       accessModes:
-#       {% for mode in volume.accessModes %}
-#       - {{ mode }}
-#       {% endfor %}
-      {% if volume.type == "hostPath" %}
-      - ReadWriteMany
-      - ReadWriteOnce
-      {% elif volume.type == "nfs" %}
       - ReadWriteMany
       - ReadWriteOnce
       - ReadOnlyMany
-      {% endif %}
       resources:
         requests:
           storage: {{ volume.size }}

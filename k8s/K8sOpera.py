@@ -111,12 +111,14 @@ class K8sOpera:
                 self.logger.info("生成k8s资源清单job.yaml")
                 job = Job(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
                 job_list = job.get_job_info()
+                start_command_list.extend(job.create_pvc_yaml())
                 start_command_list.extend(job.create_job_yaml(job_list))
             elif announce_type == "timed":
                 """生成cronJob.yaml"""
                 self.logger.info("生成k8s资源清单cronJob.yaml")
                 cronjob = CronJob(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
                 cronjob_list = cronjob.get_cron_job_info()
+                start_command_list.extend(cronjob.create_pvc_yaml())
                 start_command_list.extend(cronjob.create_cron_job_yaml(cronjob_list))
             elif announce_type == "permanent":
                 """生成serviceAccount.yaml"""
@@ -136,15 +138,15 @@ class K8sOpera:
                     self.logger.info("生成k8s资源清单deployment.yaml")
                     deployment = Deployment(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
                     deployment_list = deployment.get_deployment_info()
-                    tmp_command = deployment.create_deployment_yaml(deployment_list)
-                    start_command_list.extend(tmp_command)
+                    start_command_list.extend(deployment.create_pvc_yaml())
+                    start_command_list.extend(deployment.create_deployment_yaml(deployment_list))
                 elif controller_type == "stateful":
                     """生成statefulSet.yaml"""
                     self.logger.info("生成k8s资源清单statefulSet.yaml")
                     stateful_set = StatefulSet(self.setting_conf, self.global_info, self.k8s_info, self.k8s_path)
                     stateful_set_list = stateful_set.get_stateful_set_info()
-                    tmp_command = stateful_set.create_stateful_set_yaml(stateful_set_list)
-                    start_command_list.extend(tmp_command)
+                    start_command_list.extend(stateful_set.create_pvc_yaml())
+                    start_command_list.extend(stateful_set.create_stateful_set_yaml(stateful_set_list))
 
                     """生成service-headless.yaml"""
                     self.logger.info("生成k8s资源清单service-headless.yaml")

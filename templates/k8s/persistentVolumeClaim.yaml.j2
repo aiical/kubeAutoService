@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-{{ name }}
+  labels:
+    name: pv-{{ name }}
+    type: nfs
+spec:
+  accessModes:
+    - ReadWriteMany
+    - ReadWriteOnce
+    - ReadOnlyMany
+  capacity:
+    storage: {{ size }}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: sc-{{ serviceName }}
+  nfs:
+    path: {{ path }}
+    server: {{ server }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-{{ name }}
+  namespace: {{ namespace }}
+  labels:
+    name: pvc-{{ name }}
+    type: nfs
+spec:
+  accessModes:
+  - ReadWriteMany
+  - ReadWriteOnce
+  - ReadOnlyMany
+  storageClassName: sc-{{ serviceName }}
+  resources:
+    requests:
+      storage: {{ size }}
+  selector:
+    matchLabels:
+      name: pv-{{ name }}
