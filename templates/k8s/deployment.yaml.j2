@@ -184,40 +184,25 @@ spec:
             memory: {{ memory.request }}
             ephemeral-storage: {{ ephemeralStorage.request }}
         {# volumeMounts #}
-        {% if fileBeatFlag == "Y" or volumeInfo.volumeCount > 0 %}
+        {% if fileBeatFlag == "Y" or volumeInfoList | length > 0 or configMapList | length > 0 %}
         volumeMounts:
         {# filebeat配置volumeMounts #}
         {% if fileBeatFlag == "Y" %}
         - name: app-logs
           mountPath: /logs
         {% endif %}
-        {# emptyDir配置volumeMounts #}
-        {% if volumeInfo.emptyDir is not none %}
-        {% for item in volumeInfo.emptyDir %}
-        - name: {{ item.name }}
-          mountPath: {{ item.mountPath }}
+        {% if volumeInfoList | length > 0 %}
+        {% for volume in volumeInfoList %}
+        {# hostPath和nfs配置volumeMounts #}
+        - name: {{ volume.name }}
+          mountPath: {{ volume.mountPath }}
         {% endfor %}
         {% endif %}
-        {# hostPath配置volumeMounts #}
-        {% if volumeInfo.hostPath is not none %}
-        {% for item in volumeInfo.hostPath %}
-        - name: {{ item.name }}
-          mountPath: {{ item.mountPath }}
-        {% endfor %}
-        {% endif %}
-        {# nfs配置volumeMounts #}
-        {% if volumeInfo.nfs is not none %}
-        {% for item in volumeInfo.nfs %}
-        - name: {{ item.name }}
-          mountPath: {{ item.mountPath }}
-        {% endfor %}
-        {% endif %}
-        {# configMap配置volumeMounts #}
-        {% if volumeInfo.configMap is not none %}
-        {% for item in volumeInfo.configMap %}
-        - name: {{ item.name }}
-          mountPath: {{ item.mountPath }}/{{ item.file }}
-          subPath: {{ item.file }}
+        {% if configMapList | length > 0 %}
+        {% for configMap in configMapList %}
+        - name: {{ configMap.name }}
+          mountPath: {{ configMap.mountPath }}/{{ configMap.file }}
+          subPath: {{ configMap.file }}
         {% endfor %}
         {% endif %}
         {% endif %}
@@ -244,7 +229,7 @@ spec:
           subPath: filebeat.yml
       {% endif %}
       {# volumes #}
-      {% if fileBeatFlag == "Y" or volumeInfo.volumeCount > 0 %}
+      {% if fileBeatFlag == "Y" or volumeInfoList | length > 0 or configMapList | length > 0 %}
       volumes:
       {# filebeat配置volumes #}
       {% if fileBeatFlag == "Y" %}
@@ -257,36 +242,24 @@ spec:
         configMap:
           name: {{ serviceName }}-fb-conf
       {% endif %}
-      {# emptyDir配置volumes #}
-      {% if volumeInfo.emptyDir is not none %}
-      {% for item in volumeInfo.emptyDir %}
-      - name: {{ item.name }}
-        emptyDir: {}
+      {% if volumeInfoList | length > 0 %}
+      {% for volume in volumeInfoList %}
+      {% if volume.type == "hostPath" %}
+      - name: {{ volume.name }}
+        persistentVolumeClaim:
+          claimName: pvc-host-path-{{ volume.name }}
+      {% elif volume.type == "nfs" %}
+      - name: {{ volume.name }}
+        persistentVolumeClaim:
+          claimName: pvc-nfs-{{ volume.name }}
+      {% endif %}
       {% endfor %}
       {% endif %}
-      {# hostPath配置volumes #}
-      {% if volumeInfo.hostPath is not none %}
-      {% for item in volumeInfo.hostPath %}
-      - name: {{ item.name }}
-        hostPath:
-          path: {{ item.localPath }}
-      {% endfor %}
-      {% endif %}
-      {# nfs配置volumes #}
-      {% if volumeInfo.nfs is not none %}
-      {% for item in volumeInfo.nfs %}
-      - name: {{ item.name }}
-        nfs:
-          server: {{ item.server }}
-          path: {{ item.path }}
-      {% endfor %}
-      {% endif %}
-      {# configMap配置volumes #}
-      {% if volumeInfo.configMap is not none %}
-      {% for item in volumeInfo.configMap %}
-      - name: {{ item.name }}
+      {% if configMapList | length > 0 %}
+      {% for configMap in configMapList %}
+      - name: {{ configMap.name }}
         configMap:
-          name: {{ item.name }}
+          name: {{ configMap.name }}
       {% endfor %}
       {% endif %}
       {% endif %}

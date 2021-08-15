@@ -13,6 +13,7 @@ spec:
   capacity:
     storage: {{ size }}
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: sc-{{ serviceName }}
   nfs:
     path: {{ path }}
     server: {{ server }}

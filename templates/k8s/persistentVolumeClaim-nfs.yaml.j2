@@ -11,6 +11,10 @@ spec:
   - ReadWriteMany
   - ReadWriteOnce
   - ReadOnlyMany
+  storageClassName: sc-{{ serviceName }}
   resources:
     requests:
       storage: {{ size }}
+  selector:
+    matchLabels:
+      name: pv-nfs-{{ name }}

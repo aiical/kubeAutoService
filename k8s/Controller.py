@@ -125,120 +125,86 @@ class Controller:
                 'lifecycle': lifecycle,
             })
 
-    def get_volume_info(self, controller_type):
+    def get_volume_info(self):
         try:
             """获取volume信息"""
-            tmp_empty_dir_list = self.container_info['volume']['emptyDir']
-            empty_dir_list = []
-            if tmp_empty_dir_list is not None:
-                for item in tmp_empty_dir_list:
-                    v_mount = item['mountPath']
-                    v_dir = v_mount.split('/')[-1].lower()
-                    v_name = "%s-%s" % (self.service_name, v_dir)
-                    empty_dir_list.append({
-                        'name': v_name,
-                        'mountPath': v_mount
-                    })
+            volume_dir_info_list = []
+            volume_file_info_list = []
 
-            tmp_host_path_list = self.container_info['volume']['hostPath']
-            host_path_list = []
-            if tmp_host_path_list is not None:
-                for item in tmp_host_path_list:
-                    v_mount = item['mountPath']
-                    v_dir = v_mount.split('/')[-1].lower()
-                    v_name = "%s-%s" % (self.service_name, v_dir)
-                    v_local = item['localPath']
-                    host_path_list.append({
-                        'name': v_name,
-                        'mountPath': v_mount,
-                        'localPath': v_local
-                    })
-
-            tmp_config_map_list = self.container_info['volume']['configMap']
-            config_map_list = []
-            if tmp_config_map_list is not None:
-                for item in tmp_config_map_list:
-                    v_mount = item['mountPath']
-                    v_file = item['fileName']
-                    tmp_name = ''.join(list(filter(str.isalnum, v_file))).lower()
-                    v_name = "%s-%s" % (self.service_name, tmp_name)
-                    v_key = item['key']
-                    v_md5_code = item['md5Code']
-                    config_map_list.append({
-                        'name': v_name,
-                        'mountPath': v_mount,
-                        'file': v_file,
-                        'key': v_key,
-                        'md5Code': v_md5_code
-                    })
-
-            pvc_list = []
-            nfs_list = []
-            if controller_type == "stateful":
-                tmp_pvc_list = self.container_info['volume']['pvc']
-                if tmp_pvc_list is not None:
-                    for item in tmp_pvc_list:
-                        v_mount = item['mountPath']
+            volume_list = self.container_info['volume']
+            if volume_list:
+                for volume in volume_list:
+                    volume_type = volume['type']
+                    if volume_type == "hostPath":
+                        v_mount = volume['mountPath']
+                        v_size = volume['pvcSize']
                         v_dir = v_mount.split('/')[-1].lower()
                         v_name = "%s-%s" % (self.service_name, v_dir)
-                        v_access_modes = item['accessModes']
-                        v_size = item['size']
-                        v_storage_class_name = item['storageClassName']
-                        pvc_list.append({
-                            'name': v_name,
-                            'mountPath': v_mount,
-                            'accessModes': v_access_modes,
-                            'size': v_size,
-                            'storageClassName': v_storage_class_name
-                        })
-                mount_count = len(empty_dir_list) + len(host_path_list) + len(pvc_list) + len(config_map_list)
-                volume_count = len(empty_dir_list) + len(host_path_list) + len(config_map_list)
-                volume_info = {
-                    'mountCount': int(mount_count),
-                    'volumeCount': int(volume_count),
-                    'emptyDir': empty_dir_list,
-                    'hostPath': host_path_list,
-                    'pvc': pvc_list,
-                    'configMap': config_map_list,
-                }
-            else:
-                tmp_nfs_list = self.container_info['volume']['nfs']
-
-                if tmp_nfs_list is not None:
-                    for item in tmp_nfs_list:
-                        v_mount = item['mountPath']
+                        v_local = volume['localPath']
+                        volume_dir_info_list.append(copy.deepcopy(
+                            {
+                                'type': volume_type,
+                                'name': v_name,
+                                'size': v_size,
+                                'mountPath': v_mount,
+                                'localPath': v_local
+                            }
+                        ))
+                    elif volume_type == "configMap":
+                        v_mount = volume['mountPath']
+                        v_file = volume['fileName']
+                        tmp_name = ''.join(list(filter(str.isalnum, v_file))).lower()
+                        v_name = "%s-%s" % (self.service_name, tmp_name)
+                        v_key = volume['key']
+                        v_md5_code = volume['md5Code']
+                        volume_file_info_list.append(copy.deepcopy(
+                            {
+                                'type': volume_type,
+                                'name': v_name,
+                                'mountPath': v_mount,
+                                'file': v_file,
+                                'key': v_key,
+                                'md5Code': v_md5_code
+                            }
+                        ))
+                    elif volume_type == "nfs":
+                        v_mount = volume['mountPath']
                         v_dir = v_mount.split('/')[-1].lower()
                         v_name = "%s-%s" % (self.service_name, v_dir)
-                        v_nfs_server = item['server']
-                        v_nfs_base_path = item['path']
-                        v_node_mount_path = item['nodePath']
-                        v_is_file_share = item['isFileShare']
-                        v_nfs_final_path = "%s/%s/%s/%s" % (
-                            v_nfs_base_path, self.sys_name, self.service_name, v_dir)
-                        v_node_need_mkdir_path = "%s/%s/%s/%s" % (
-                            v_node_mount_path, self.sys_name, self.service_name, v_dir)
+                        v_nfs_server = volume['server']
+                        v_nfs_base_path = volume['path']
+                        v_size = volume['pvcSize']
+                        v_local_mount_path = volume['nodePath']
+                        v_is_file_share = volume['isFileShare']
+                        v_is_nfs_share = volume['isNfsShare']
+                        if v_is_nfs_share == "Y":
+                            v_nfs_final_path = "%s/%s/%s/%s" % (
+                                v_nfs_base_path, self.sys_name, self.service_name, v_dir)
+                            v_node_need_mkdir_path = "%s/%s/%s/%s" % (
+                                v_local_mount_path, self.sys_name, self.service_name, v_dir)
+                            v_node_need_mkdir_path = v_node_need_mkdir_path.replace("//", "/")
+                            if not os.path.exists(v_node_need_mkdir_path):
+                                os.makedirs(v_node_need_mkdir_path)
+                        else:
+                            v_nfs_final_path = v_nfs_base_path
                         v_nfs_final_path = v_nfs_final_path.replace("//", "/")
-                        v_node_need_mkdir_path = v_node_need_mkdir_path.replace("//", "/")
-                        if not os.path.exists(v_node_need_mkdir_path):
-                            os.makedirs(v_node_need_mkdir_path)
-                        nfs_list.append({
-                            'name': v_name,
-                            'mountPath': v_mount,
-                            'server': v_nfs_server,
-                            'path': v_nfs_final_path,
-                            'isFileShare': v_is_file_share
-                        })
+                        volume_dir_info_list.append(copy.deepcopy(
+                            {
+                                'type': volume_type,
+                                'name': v_name,
+                                'size': v_size,
+                                'mountPath': v_mount,
+                                'server': v_nfs_server,
+                                'path': v_nfs_final_path,
+                                'isFileShare': v_is_file_share
+                            }
+                        ))
+                    else:
+                        self.logger.warn("程序暂时不支持该种volume类型【%s】，跳过不处理" % volume_type)
 
-                volume_count = len(empty_dir_list) + len(host_path_list) + len(nfs_list) + len(config_map_list)
-                volume_info = {
-                    'volumeCount': int(volume_count),
-                    'emptyDir': empty_dir_list,
-                    'hostPath': host_path_list,
-                    'nfs': nfs_list,
-                    'configMap': config_map_list,
-                }
             self.controller_info.update({
-                'volumeInfo': volume_info,
+                'volumeInfoList': volume_dir_info_list,
+                'configMapList': volume_file_info_list
             })
         except(KeyError, NameError):
             self.logger.error(traceback.format_exc())

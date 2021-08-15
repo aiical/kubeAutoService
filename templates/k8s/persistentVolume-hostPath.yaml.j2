@@ -12,5 +12,6 @@ spec:
   capacity:
     storage: {{ size }}
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: sc-{{ serviceName }}
   hostPath:
     path: {{ localPath }}

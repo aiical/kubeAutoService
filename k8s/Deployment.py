@@ -16,7 +16,7 @@ class Deployment(Controller):
         self.logger.info("开始获取deployment信息")
         deployment_list = []
         Controller.get_controller_share_info(self)
-        Controller.get_volume_info(self, "stateless")
+        Controller.get_volume_info(self)
         Controller.get_pod_live_info(self)
         Controller.get_if_istio_ip(self)
         """获取版本个数"""

@@ -3,13 +3,17 @@ kind: PersistentVolumeClaim
 metadata:
   name: pvc-host-path-{{ name }}
   namespace: {{ namespace }}
-  labels: # 这些labels可以不定义
+  labels:
     name: pvc-host-path-{{ name }}
     type: hostPath
 spec:
   accessModes:
   - ReadWriteMany
   - ReadWriteOnce
+  storageClassName: sc-{{ serviceName }}
   resources:
     requests:
       storage: {{ size }}
+  selector:
+    matchLabels:
+      name: pv-host-path-{{ name }}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="OrchideExtraVarsSettings">
+    <option name="extraVars">
+      <list>
+        <option value="name" />
+        <option value="namespace" />
+        <option value="fileName" />
+        <option value="serviceName" />
+        <option value="appName" />
+        <option value="sysName" />
+        <option value="clusterName" />
+        <option value="schedule" />
+        <option value="imageFullName" />
+        <option value="cpu" />
+        <option value="memory" />
+        <option value="ephemeralStorage" />
+        <option value="libraryRepository" />
+        <option value="filebeatVersion" />
+        <option value="liveness" />
+        <option value="readiness" />
+        <option value="startup" />
+        <option value="version" />
+        <option value="dubboPort" />
+        <option value="containerPort" />
+        <option value="istioWhiteIp" />
+        <option value="replicas" />
+        <option value="httpCookieName" />
+      </list>
+    </option>
+  </component>
+</project>
