@@ -12,7 +12,7 @@ class CronJob(Controller):
     def get_cron_job_info(self):
         self.logger.info("开始获取cronJob信息")
         Controller.get_controller_share_info(self)
-        Controller.get_volume_info(self, "job")
+        Controller.get_volume_info(self)
         Controller.get_cron_job_schedule(self)
         self.logger.info("获取cronJob信息完成")
         return self.controller_info

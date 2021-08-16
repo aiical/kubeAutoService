@@ -213,7 +213,7 @@ spec:
           subPath: filebeat.yml
       {% endif %}
       {# volumes #}
-      {% if fileBeatFlag == "Y" or configMapList | length > 0 or volumeLocalInfoList | length > 0 %}
+      {% if fileBeatFlag == "Y" or configMapList | length > 0 %}
       volumes:
       {# filebeat配置volumes #}
       {% if fileBeatFlag == "Y" %}
@@ -226,13 +226,13 @@ spec:
         configMap:
           name: {{ serviceName }}-fb-conf
       {% endif %}
-      {% if volumeLocalInfoList | length > 0 %}
-      {% for volume in volumeLocalInfoList %}
-      - name: {{ volume.name }}
-        hostPath:
-          path: {{ volume.localPath }}
-      {% endfor %}
-      {% endif %}
+{#      {% if volumeLocalInfoList | length > 0 %}#}
+{#      {% for volume in volumeLocalInfoList %}#}
+{#      - name: {{ volume.name }}#}
+{#        hostPath:#}
+{#          path: {{ volume.localPath }}#}
+{#      {% endfor %}#}
+{#      {% endif %}#}
       {% if configMapList | length > 0 %}
       {% for configMap in configMapList %}
       - name: {{ configMap.name }}
@@ -242,7 +242,7 @@ spec:
       {% endif %}
       {% endif %}
   {# pvc配置volumeClaimTemplates #}
-  {% if volumeNfsInfoList | length > 0 %}
+  {% if volumeNfsInfoList | length > 0 or volumeLocalInfoList | length > 0%}
   volumeClaimTemplates:
   {% for volume in volumeNfsInfoList %}
   - metadata:
@@ -252,6 +252,19 @@ spec:
       - ReadWriteMany
       - ReadWriteOnce
       - ReadOnlyMany
+      resources:
+        requests:
+          storage: {{ volume.size }}
+      storageClassName: sc-{{ serviceName }}
+  {% endfor %}
+  {% endif %}
+  {% for volume in volumeLocalInfoList %}
+  - metadata:
+      name: {{ volume.name }}
+    spec:
+      accessModes:
+      - ReadWriteMany
+      - ReadWriteOnce
       resources:
         requests:
           storage: {{ volume.size }}

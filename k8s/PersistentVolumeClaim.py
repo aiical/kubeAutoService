@@ -30,10 +30,21 @@ class PersistentVolumeClaim:
             announce_type = self.controller_info['announceType']
             volume_info_list = self.controller_info['volumeNfsInfoList']
             persistent_volume_info_list = []
+            persistent_local_volume_info_list = []
             if volume_info_list:
                 if announce_type == "permanent" and controller_type == "stateful":
-                    for volume_info in volume_info_list:
+                    local_volume_info_list = self.controller_info['volumeLocalInfoList']
+                    for volume_info in local_volume_info_list:
+                        for i in range(0, int(replicas)):
+                            tmp_volume_info = volume_info
+                            v_name = "%s-local-%s" % (volume_info['name'], str(i))
+                            tmp_volume_info.update({
+                                'name': v_name,
+                                'localMkdir': volume_info['localPath']
+                            })
+                            persistent_local_volume_info_list.append(copy.deepcopy(tmp_volume_info))
 
+                    for volume_info in volume_info_list:
                         if int(replicas) == 1 and volume_info['isNfsShare'] == "N":
                             persistent_volume_info_list.append(copy.deepcopy(volume_info))
                         else:
@@ -61,6 +72,7 @@ class PersistentVolumeClaim:
             abort(404)
         else:
             self.logger.info("获取PersistentVolumeClaim信息完成")
+            persistent_volume_info_list = persistent_volume_info_list.extend(persistent_local_volume_info_list)
             return persistent_volume_info_list
 
     def create_persistent_volume_claim_yaml(self, persistent_volume_info):

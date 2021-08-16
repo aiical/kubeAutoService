@@ -5,19 +5,25 @@ metadata:
   name: pv-{{ name }}
   labels:
     name: pv-{{ name }}
-    type: nfs
 spec:
   accessModes:
     - ReadWriteMany
     - ReadWriteOnce
+    {% if type != "dir-local" %}
     - ReadOnlyMany
+    {% endif %}
   capacity:
     storage: {{ size }}
   persistentVolumeReclaimPolicy: Retain
   storageClassName: sc-{{ serviceName }}
+  {% if type == "dir-nfs" %}
   nfs:
     path: {{ path }}
     server: {{ server }}
+  {% elif type == "dir-local" %}
+  hostPath:
+    path: {{ localPath }}
+  {% endif %}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -26,12 +32,13 @@ metadata:
   namespace: {{ namespace }}
   labels:
     name: pvc-{{ name }}
-    type: nfs
 spec:
   accessModes:
   - ReadWriteMany
   - ReadWriteOnce
+  {% if type != "dir-local" %}
   - ReadOnlyMany
+  {% endif %}
   storageClassName: sc-{{ serviceName }}
   resources:
     requests:

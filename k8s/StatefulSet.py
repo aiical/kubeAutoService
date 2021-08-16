@@ -14,7 +14,7 @@ class StatefulSet(Controller):
     def get_stateful_set_info(self):
         self.logger.info("开始获取statefulSet信息")
         Controller.get_controller_share_info(self)
-        Controller.get_volume_info(self, "stateful")
+        Controller.get_volume_info(self)
         Controller.get_pod_live_info(self)
         Controller.get_if_istio_ip(self)
         self.logger.info("获取statefulSet信息完成")

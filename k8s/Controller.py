@@ -149,6 +149,7 @@ class Controller:
                     v_local = volume['localPath']
                     volume_dir_local_info_list.append(copy.deepcopy(
                         {
+                            'type': "dir-local",
                             'name': v_name,
                             'size': v_size,
                             'mountPath': v_mount,
@@ -165,6 +166,7 @@ class Controller:
                     v_md5_code = volume['md5Code']
                     volume_file_info_list.append(copy.deepcopy(
                         {
+                            'type': "file",
                             'name': v_name,
                             'mountPath': v_mount,
                             'file': v_file,
@@ -199,6 +201,7 @@ class Controller:
                     v_nfs_final_path = v_nfs_final_path.replace("//", "/")
                     volume_dir_nfs_info_list.append(copy.deepcopy(
                         {
+                            'type': "dir-nfs",
                             'name': v_name,
                             'serviceName': self.service_name,
                             'namespace': self.namespace,
