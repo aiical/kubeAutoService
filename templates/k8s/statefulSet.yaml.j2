@@ -112,7 +112,7 @@ spec:
           exec:
             command:
             {% for item in readiness.exec.commandList %}
-            - item
+            - {{ item }}
             {% endfor %}
           {% endif %}
           initialDelaySeconds: {{ readiness.initialDelaySeconds }}
@@ -131,7 +131,7 @@ spec:
           exec:
             command:
             {% for item in liveness.exec.commandList %}
-            - item
+            - {{ item }}
             {% endfor %}
           {% endif %}
           initialDelaySeconds: {{ liveness.initialDelaySeconds }}
@@ -153,7 +153,7 @@ spec:
             exec:
               command:
               {% for item in lifecycle.preStopCommandList %}
-              - item
+              - {{ item }}
               {% endfor %}
           {% endif %}
         {% endif %}
@@ -257,7 +257,6 @@ spec:
           storage: {{ volume.size }}
       storageClassName: sc-{{ serviceName }}
   {% endfor %}
-  {% endif %}
   {% for volume in volumeLocalInfoList %}
   - metadata:
       name: {{ volume.name }}

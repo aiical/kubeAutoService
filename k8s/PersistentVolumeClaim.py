@@ -29,6 +29,7 @@ class PersistentVolumeClaim:
             controller_type = self.controller_info['controllerType']
             announce_type = self.controller_info['announceType']
             volume_info_list = self.controller_info['volumeNfsInfoList']
+            self.logger.info(volume_info_list)
             persistent_volume_info_list = []
             persistent_local_volume_info_list = []
             if volume_info_list:
@@ -45,14 +46,18 @@ class PersistentVolumeClaim:
                             persistent_local_volume_info_list.append(copy.deepcopy(tmp_volume_info))
 
                     for volume_info in volume_info_list:
-                        if int(replicas) == 1 and volume_info['isNfsShare'] == "N":
+                        if int(replicas) == 1 and volume_info['isNfsShare'] == "0":
                             persistent_volume_info_list.append(copy.deepcopy(volume_info))
                         else:
                             for i in range(0, int(replicas)):
                                 tmp_volume_info = volume_info
                                 v_name = "%s-%s" % (volume_info['name'], str(i))
-                                v_path = "%s-%s" % (volume_info['path'], str(i))
-                                v_local_mkdir = "%s-%s" % (volume_info['localMkdir'], str(i))
+                                if volume_info['isNfsShare'] == "1":
+                                    v_path = "%s-%s" % (volume_info['path'], str(i))
+                                    v_local_mkdir = "%s-%s" % (volume_info['localMkdir'], str(i))
+                                else:
+                                    v_path = volume_info['path']
+                                    v_local_mkdir = volume_info['localMkdir']
                                 tmp_volume_info.update({
                                     'name': v_name,
                                     'path': v_path,
@@ -63,16 +68,19 @@ class PersistentVolumeClaim:
                     for volume_info in volume_info_list:
                         persistent_volume_info_list.append(copy.deepcopy(volume_info))
                 for item in persistent_volume_info_list:
+                    self.logger.info("localMkdir:%s" % item['localMkdir'])
                     if not os.path.exists(item['localMkdir']):
                         os.makedirs(item['localMkdir'])
-        except(KeyError, NameError):
+
+            self.logger.info("获取PersistentVolumeClaim信息完成")
+            persistent_volume_info_list += persistent_local_volume_info_list
+            self.logger.info(persistent_volume_info_list)
+        except Exception:
             self.logger.error(traceback.format_exc())
             send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
                             "[ERROR]：%s" % traceback.format_exc())
             abort(404)
         else:
-            self.logger.info("获取PersistentVolumeClaim信息完成")
-            persistent_volume_info_list = persistent_volume_info_list.extend(persistent_local_volume_info_list)
             return persistent_volume_info_list
 
     def create_persistent_volume_claim_yaml(self, persistent_volume_info):

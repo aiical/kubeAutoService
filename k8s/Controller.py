@@ -187,7 +187,7 @@ class Controller:
                     v_local_mount_path = volume['nodePath']
                     v_is_file_share = volume['isFileShare']
                     v_is_nfs_share = volume['isNfsShare']
-                    if v_is_nfs_share == "Y":
+                    if v_is_nfs_share == "1":
                         v_nfs_final_path = "%s/%s/%s/%s" % (
                             v_nfs_base_path, self.sys_name, self.service_name, v_dir)
                         v_local_need_mkdir_path = "%s/%s/%s/%s" % (
@@ -196,7 +196,7 @@ class Controller:
                         # if not os.path.exists(v_local_need_mkdir_path):
                         #     os.makedirs(v_local_need_mkdir_path)
                     else:
-                        v_local_need_mkdir_path = ""
+                        v_local_need_mkdir_path = v_nfs_base_path
                         v_nfs_final_path = v_nfs_base_path
                     v_nfs_final_path = v_nfs_final_path.replace("//", "/")
                     volume_dir_nfs_info_list.append(copy.deepcopy(
@@ -298,6 +298,7 @@ class Controller:
         pvc = PersistentVolumeClaim(self.global_info, self.controller_info, self.k8s_path)
         pvc_info_list = pvc.get_persistent_volume_claim_info()
         for pvc_info in pvc_info_list:
+            self.logger.info(pvc_info)
             tmp_command_list = pvc.create_persistent_volume_claim_yaml(pvc_info)
             apply_command_list.extend(tmp_command_list)
         return apply_command_list

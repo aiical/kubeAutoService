@@ -56,7 +56,6 @@ class K8sOpera:
                 """备份k8s yaml目录
                 YamlFile_yyyymmddHh24miss
                 """
-                logger = Logger("server")
                 dir_bak_time = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
                 self.k8s_bak_path = self.k8s_path + '_' + dir_bak_time
 
@@ -64,16 +63,20 @@ class K8sOpera:
                 if os.path.exists(self.k8s_path):
                     self.k8s_ori_yaml_file = get_files(self.k8s_path, '.yaml')
                     str_cmd = "mv %s %s" % (self.k8s_path, self.k8s_bak_path)
-                    logger.info("备份目录%s到%s" % (self.k8s_path, self.k8s_bak_path))
-                    logger.info("COMMAND: %s" % str_cmd)
+                    self.logger.info("备份目录%s到%s" % (self.k8s_path, self.k8s_bak_path))
+                    self.logger.info("COMMAND: %s" % str_cmd)
                     if not shell_cmd("server", str_cmd):
                         send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
                                         "[ERROR]:COMMAND:%s执行出错" % str_cmd)
                         abort(404)
 
                     start_file = "%s/appStart.sh" % self.k8s_bak_path
-                    file_replace(start_file, self.k8s_path, self.k8s_bak_path)
-                    logger.info("修改备份目录下%s中文件目录从%s到%s" % (start_file, self.k8s_path, self.k8s_bak_path))
+                    self.logger.info("start_file:%s" % start_file)
+                    self.logger.info("self.k8s_path:%s" % self.k8s_path)
+                    self.logger.info("self.k8s_bak_path:%s" % self.k8s_bak_path)
+                    if os.path.exists(start_file):
+                        file_replace(start_file, self.k8s_path, self.k8s_bak_path)
+                    self.logger.info("修改备份目录下%s中文件目录从%s到%s" % (start_file, self.k8s_path, self.k8s_bak_path))
 
                 os.makedirs(self.k8s_path)
 

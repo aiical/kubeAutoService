@@ -99,7 +99,7 @@ spec:
             command:
             {% if  startup.exec.commandList is not none %}
             {% for item in startup.exec.commandList %}
-            - item
+            - {{ item }}
             {% endfor %}
             {% endif %}
           {% endif %}
@@ -122,7 +122,7 @@ spec:
             command:
             {% if  readiness.exec.commandList is not none %}
             {% for item in readiness.exec.commandList %}
-            - item
+            - {{ item }}
             {% endfor %}
             {% endif %}
           {% endif %}
@@ -145,7 +145,7 @@ spec:
             command:
             {% if  liveness.exec.commandList is not none %}
             {% for item in liveness.exec.commandList %}
-            - item
+            - {{ item }}
             {% endfor %}
             {% endif %}
           {% endif %}
