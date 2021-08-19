@@ -138,6 +138,7 @@ class Controller:
             local_volume_list = self.container_info['volume']['hostPath']
             nfs_volume_list = self.container_info['volume']['nfs']
             config_volume_list = self.container_info['volume']['configMap']
+            controller_type = self.k8s_info['controllerType']
             if local_volume_list:
                 for volume in local_volume_list:
                     v_mount = volume['mountPath']
@@ -146,14 +147,18 @@ class Controller:
                     v_size = volume['pvcSize']
                     v_dir = v_mount[1:].replace("/", "-").replace("_", "-").lower()
                     v_name = "%s-%s" % (self.service_name, v_dir)
+                    v_claim_name = "pvc-%s" % v_dir
                     v_local = volume['localPath']
                     volume_dir_local_info_list.append(copy.deepcopy(
                         {
                             'type': "dir-local",
                             'name': v_name,
+                            'claimName': v_claim_name,
                             'size': v_size,
                             'mountPath': v_mount,
-                            'localPath': v_local
+                            'localPath': v_local,
+                            'controller': controller_type,
+                            'serviceName': self.service_name,
                         }
                     ))
             if config_volume_list:
@@ -181,6 +186,7 @@ class Controller:
                         v_mount = v_mount[:-1]
                     v_dir = v_mount[1:].replace("/", "-").replace("_", "-").lower()
                     v_name = "%s-%s" % (self.service_name, v_dir)
+                    v_claim_name = "pvc-%s" % v_dir
                     v_nfs_server = volume['server']
                     v_nfs_base_path = volume['path']
                     v_size = volume['pvcSize']
@@ -203,6 +209,7 @@ class Controller:
                         {
                             'type': "dir-nfs",
                             'name': v_name,
+                            'claimName': v_claim_name,
                             'serviceName': self.service_name,
                             'namespace': self.namespace,
                             'size': v_size,
@@ -211,7 +218,8 @@ class Controller:
                             'path': v_nfs_final_path,
                             'isFileShare': v_is_file_share,
                             'isNfsShare': v_is_nfs_share,
-                            'localMkdir': v_local_need_mkdir_path
+                            'localMkdir': v_local_need_mkdir_path,
+                            'controller': controller_type
                         }
                     ))
 

@@ -36,28 +36,44 @@ class PersistentVolumeClaim:
                 if announce_type == "permanent" and controller_type == "stateful":
                     local_volume_info_list = self.controller_info['volumeLocalInfoList']
                     for volume_info in local_volume_info_list:
+                        tmp_volume_info = volume_info
+                        tmp_name = volume_info['name']
+                        v_local = volume_info['localPath']
                         for i in range(0, int(replicas)):
-                            tmp_volume_info = volume_info
-                            v_name = "%s-local-%s" % (volume_info['name'], str(i))
+                            v_name = "%s-local-%s" % (tmp_name, str(i))
                             tmp_volume_info.update({
                                 'name': v_name,
-                                'localMkdir': volume_info['localPath']
+                                'localMkdir': v_local
                             })
                             persistent_local_volume_info_list.append(copy.deepcopy(tmp_volume_info))
 
                     for volume_info in volume_info_list:
-                        if int(replicas) == 1 and volume_info['isNfsShare'] == "0":
-                            persistent_volume_info_list.append(copy.deepcopy(volume_info))
+                        tmp_share = volume_info['isNfsShare']
+                        if int(replicas) == 1 and tmp_share == "0":
+                            tmp_volume_info = volume_info
+                            tmp_name = volume_info['name']
+                            v_name = "%s-0" % tmp_name
+                            tmp_volume_info.update({
+                                'name': v_name,
+                            })
+                            persistent_volume_info_list.append(copy.deepcopy(tmp_volume_info))
                         else:
+                            tmp_name = volume_info['name']
+                            tmp_path = volume_info['path']
+                            if tmp_path[-1] == "/":
+                                tmp_path = tmp_path[:-1]
+                            tmp_local = volume_info['localMkdir']
+                            if tmp_local[-1] == "/":
+                                tmp_local = tmp_local[:-1]
                             for i in range(0, int(replicas)):
                                 tmp_volume_info = volume_info
-                                v_name = "%s-%s" % (volume_info['name'], str(i))
-                                if volume_info['isNfsShare'] == "1":
-                                    v_path = "%s-%s" % (volume_info['path'], str(i))
-                                    v_local_mkdir = "%s-%s" % (volume_info['localMkdir'], str(i))
-                                else:
-                                    v_path = volume_info['path']
-                                    v_local_mkdir = volume_info['localMkdir']
+                                v_name = "%s-%s" % (tmp_name, str(i))
+                                # if tmp_share == "1":
+                                v_path = "%s-%s" % (tmp_path, str(i))
+                                v_local_mkdir = "%s-%s" % (tmp_local, str(i))
+                                # else:
+                                #     v_path = tmp_path
+                                #     v_local_mkdir = tmp_local
                                 tmp_volume_info.update({
                                     'name': v_name,
                                     'path': v_path,

@@ -72,6 +72,9 @@ class Service:
             svc_str = "service"
         else:
             svc_str = "service-headless"
+            service_info.update({
+                'ifHeadless': "Y"
+            })
         self.logger.info("开始创建%s.yaml" % svc_str)
         self.logger.info("%s配置如下：" % svc_str)
         self.logger.info(service_info)

@@ -178,14 +178,14 @@ spec:
         {% if volumeLocalInfoList | length > 0 %}
         {% for volume in volumeLocalInfoList %}
         {# hostPath配置volumeMounts #}
-        - name: {{ volume.name }}
+        - name: {{ volume.claimName }}
           mountPath: {{ volume.mountPath }}
         {% endfor %}
         {% endif %}
         {% if volumeNfsInfoList | length > 0 %}
         {% for volume in volumeNfsInfoList %}
         {# nfs配置volumeMounts #}
-        - name: {{ volume.name }}
+        - name: {{ volume.claimName }}
           mountPath: {{ volume.mountPath }}
         {% endfor %}
         {% endif %}
@@ -246,7 +246,7 @@ spec:
   volumeClaimTemplates:
   {% for volume in volumeNfsInfoList %}
   - metadata:
-      name: {{ volume.name }}
+      name: {{ volume.claimName }}
     spec:
       accessModes:
       - ReadWriteMany
@@ -259,7 +259,7 @@ spec:
   {% endfor %}
   {% for volume in volumeLocalInfoList %}
   - metadata:
-      name: {{ volume.name }}
+      name: {{ volume.claimName }}
     spec:
       accessModes:
       - ReadWriteMany

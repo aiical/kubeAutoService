@@ -24,6 +24,7 @@ spec:
   hostPath:
     path: {{ localPath }}
   {% endif %}
+{% if controller != "stateful" %}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -46,3 +47,4 @@ spec:
   selector:
     matchLabels:
       name: pv-{{ name }}
+{% endif %}
