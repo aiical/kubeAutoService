@@ -29,6 +29,20 @@ async def k8s_api_http_get(url, token, result_type):
                 return status, body_text
 
 
+async def k8s_api_http_patch(url, token, patch_data):
+    content_type = "application/json-patch+json"
+    headers = {
+        "Content-Type": content_type,
+        "Authorization": "Bearer %s" % token
+    }
+    async with aiohttp.ClientSession(
+            headers=headers,
+            timeout=aiohttp.ClientTimeout(total=5)) as session:
+        async with session.patch(url, data=json.dumps(patch_data)) as resp:
+            status = resp.status
+            return status
+
+
 async def http_post(url, post_data):
     headers = {
         "Content-Type": "application/json"

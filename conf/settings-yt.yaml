@@ -40,7 +40,7 @@ fileBeatDefaults:
   - host: 10.3.134.50
     port: 5044
 skyWalkingDefaults:
-  host: 10.3.134.49
+  host: 10.3.143.64
 nfsDefaults:
   version: 4.1
   host: 10.3.120.20

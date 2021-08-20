@@ -13,6 +13,7 @@ from k8s.InitSystem import InitSystem
 from k8s.InitApp import InitApp
 from k8s.InitPolicy import InitPolicy
 from k8s.CheckOpera import CheckOpera
+from k8s.PatchLabel import PatchLabel
 
 
 app = Flask(__name__)
@@ -88,6 +89,19 @@ def set_access_strategy(post_json_data):
     access_strategy = InitPolicy(setting_conf, post_json_data)
     access_strategy.check()
     access_strategy.deploy()
+
+
+@app.route('/auto/patchNodeLabel', methods=["POST"])
+def run_auto_path_node_label():
+    post_data = request.get_data()
+    post_json_data = json.loads(post_data.decode("utf-8"))
+    executor.submit(run_app_task, post_json_data)
+    return 'task done!'
+
+
+def run_path_node_label(post_json_data):
+    label_task = PatchLabel(setting_conf, post_json_data)
+    label_task.deploy()
 
 
 def run_redis_task(redis_data):
