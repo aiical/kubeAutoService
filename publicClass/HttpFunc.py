@@ -38,9 +38,10 @@ async def k8s_api_http_patch(url, token, patch_data):
     async with aiohttp.ClientSession(
             headers=headers,
             timeout=aiohttp.ClientTimeout(total=5)) as session:
-        async with session.patch(url, data=json.dumps(patch_data)) as resp:
+        async with session.patch(url, data=patch_data) as resp:
             status = resp.status
-            return status
+            body_json = await resp.json()
+            return status, body_json
 
 
 async def http_post(url, post_data):

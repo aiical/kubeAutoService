@@ -1,0 +1,18 @@
+{
+  "global": {
+    "labels": [
+      {
+        "name": "sysname",
+        "value": "default"
+      },
+      {
+        "name": "use",
+        "value": "test"
+      }
+    ],
+    "nodes": [
+      "172.30.240.10",
+      "172.30.240.11"
+    ]
+  }
+}

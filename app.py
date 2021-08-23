@@ -91,11 +91,11 @@ def set_access_strategy(post_json_data):
     access_strategy.deploy()
 
 
-@app.route('/auto/patchNodeLabel', methods=["POST"])
+@app.route('/auto/clusterPara', methods=["POST"])
 def run_auto_path_node_label():
     post_data = request.get_data()
     post_json_data = json.loads(post_data.decode("utf-8"))
-    executor.submit(run_app_task, post_json_data)
+    executor.submit(run_path_node_label, post_json_data)
     return 'task done!'
 
 
