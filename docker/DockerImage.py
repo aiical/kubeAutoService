@@ -134,7 +134,6 @@ class DockerImage:
                 final_tag = "v" + date + "." + str(add_num)
             logger.info("创建新镜像标签final_tag：[%s]" % final_tag)
             str_image_final = "%s/%s/%s:%s" % (harbor_ip, project_name, service_name, final_tag)
-
         else:
             logger.info("本次发布不进行制作镜像")
             exist_image_info = docker_info['existImage']
@@ -227,6 +226,25 @@ class DockerImage:
         else:
             return maintainer
 
+    def __get_labels(self):
+        label_list = []
+        try:
+            tmp_files = self.docker_info['file']
+            if tmp_files:
+                for file in tmp_files:
+                    file_name = file['name']
+                    file_key = file['key']
+                    str_label = "LABEL %s=%s" % (file_name, file_key)
+                    label_list.append(str_label)
+        except(KeyError, NameError):
+            self.logger.error(traceback.format_exc())
+            send_state_back(self.task_back_url, self.task_flow_id, 5, 5,
+                            "[ERROR]：%s" % traceback.format_exc())
+            abort(404)
+
+        else:
+            return label_list
+
     def __get_file(self):
         try:
             tmp_files = self.docker_info['file']
@@ -254,8 +272,6 @@ class DockerImage:
 
     def __get_run(self):
         list_run = []
-        # dft_run = "RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' > /etc/timezone"
-        # list_run.append(dft_run)
         try:
             tmp_run = self.docker_info['run']
         except(KeyError, NameError):
@@ -304,9 +320,6 @@ class DockerImage:
             return entry_point
 
     def __get_cmd(self):
-        pass
-
-    def __get_label(self):
         pass
 
     def __get_work_dir(self):
@@ -566,6 +579,7 @@ class DockerImage:
         self.logger.info("开始配置Dockerfile")
         """FROM"""
         str_from = self.__get_from()
+        # label_list = self.__get_labels()
         """MAINTAINER"""
         str_maintainer = self.__get_maintainer()
         """WORKDIR"""
@@ -687,6 +701,7 @@ class DockerImage:
 
         docker_file_conf = {
             'baseFrom': str_from,
+            # 'labelList': label_list,
             'maintainer': str_maintainer,
             'workdir': str_work_dir,
             'envList': env_list,

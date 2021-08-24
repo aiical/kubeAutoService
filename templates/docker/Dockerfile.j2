@@ -2,6 +2,12 @@
 FROM {{ baseFrom }}
 {# MAINTAINER #}
 MAINTAINER {{ maintainer }}
+{# LABEL #}
+{#{% if labelList != [] %}#}
+{#{% for label in labelList %}#}
+{#{{ label }}#}
+{#{% endfor %}#}
+{#{% endif %}#}
 {# RUN mkdir #}
 {% if mkdirList != [] %}
 {% for mkdir in mkdirList %}

@@ -85,6 +85,20 @@ async def harbor_api_http_post(url, post_data, username, password):
             return status
 
 
+async def harbor_api_http_delete(url, username, password):
+    auth = aiohttp.BasicAuth(login=username, password=password)
+    headers = {
+        "accept": "application/json"
+    }
+    async with aiohttp.ClientSession(
+            headers=headers,
+            auth=auth,
+            timeout=aiohttp.ClientTimeout(total=5)) as session:
+        async with session.delete(url) as resp:
+            status = resp.status
+            return status
+
+
 async def get_file_func(url, params, filename):
     async with aiohttp.ClientSession() as session:
         async with session.post(url, params=params) as response:

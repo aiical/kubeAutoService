@@ -62,12 +62,14 @@ class InitApp(InitProject):
 
             global_config.update({
                 # 'tag': str_image_final
-                'imageFullName': str_image_final
+                'imageFullName': str_image_final,
             })
 
             global_config.update({
                 'skyWalkingHome': ""
             })
+
+            dockerfile = DockerImage(self.settings_conf, global_config, docker_config)
 
             """docker部署部分"""
             if docker_type == "new":
@@ -126,7 +128,6 @@ class InitApp(InitProject):
                     abort(404)
                     # return 1
                 else:
-                    dockerfile = DockerImage(self.settings_conf, global_config, docker_config)
                     self.logger.info("创建Dockerfile:")
                     # current_task_step += 1
 
@@ -153,12 +154,12 @@ class InitApp(InitProject):
                                     "[INFO]：制作镜像成功")
                     # print("制作镜像成功")
 
-                    """推送仓库"""
-                    # current_task_step += 1
-                    dockerfile.push_image()
-                    send_state_back(self.task_back_url, self.task_flow_id, 2, 3,
-                                    "[INFO]：镜像推送成功")
-                    # print("镜像推送成功")
+                    # """推送仓库"""
+                    # # current_task_step += 1
+                    # dockerfile.push_image()
+                    # send_state_back(self.task_back_url, self.task_flow_id, 2, 3,
+                    #                 "[INFO]：镜像推送成功")
+                    # # print("镜像推送成功")
 
             """k8s部署部分"""
 
@@ -174,6 +175,13 @@ class InitApp(InitProject):
                 self.logger.warn("无k8s资源部署")
                 send_state_back(self.task_back_url, self.task_flow_id, 3, 3,
                                 "[FINISH WHIT WARN]：无k8s资源部署")
+
+            if docker_type == "new":
+                """推送仓库"""
+                # current_task_step += 1
+                dockerfile.push_image()
+                send_state_back(self.task_back_url, self.task_flow_id, 2, 3,
+                                "[INFO]：镜像推送成功")
             time.sleep(2)
             send_state_back(self.task_back_url, self.task_flow_id, 3, 3,
                             "[FINISH]：应用发布成功")
