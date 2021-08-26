@@ -181,7 +181,7 @@ class InitApp(InitProject):
                 # current_task_step += 1
                 dockerfile.push_image()
                 send_state_back(self.task_back_url, self.task_flow_id, 2, 3,
-                                "[INFO]：镜像推送成功")
+                                "[INFO]：镜像推送成功", image_full_name=str_image_final)
             time.sleep(2)
             send_state_back(self.task_back_url, self.task_flow_id, 3, 3,
                             "[FINISH]：应用发布成功")

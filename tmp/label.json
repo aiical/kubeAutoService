@@ -1,18 +1,17 @@
 {
   "global": {
+
     "labels": [
       {
-        "name": "sysname",
-        "value": "default"
+        "pkId": "xxxxxx", # 主键
+        "labelName": "aa", # 标签名
+        "labelValue": "bb", # 标签值
+        "nodeIp": "1.1.1.1", # node节点ip
+        "type": "1" # 删除还是新增
       },
       {
-        "name": "use",
-        "value": "test"
+
       }
-    ],
-    "nodes": [
-      "172.30.240.10",
-      "172.30.240.11"
     ]
   }
 }

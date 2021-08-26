@@ -190,13 +190,16 @@ def compared_version(ver1, ver2):
         return 1
 
 
-def send_state_back(task_back_url, task_flow_id, task_state, step_state, step_info):
+def send_state_back(task_back_url, task_flow_id, task_state, step_state, step_info,
+                    image_full_name="None", result=None):
     logger = Logger("server")
     step_info = {
         'taskFlowId': task_flow_id,
         'taskState': str(task_state),
         'stepState': str(step_state),
-        'stepInfo': step_info
+        'stepInfo': step_info,
+        'imageFullName': image_full_name,
+        'result': result
     }
     logger.info(step_info)
     resp_status = asyncio.run(http_post(task_back_url, step_info))
